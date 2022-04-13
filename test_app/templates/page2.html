@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>
+      Construct query
+    </title>
+  </head>
+  <body>
+    <form action="{% url 'test_app:p1_result' %}" method="post">
+      {% csrf_token %}
+      <b><i>Query:</i></b>
+      <br><br>
+      CONSTRUCT { <input type="text" name="construct" required> }<br><br>
+      {{data_external}}
+      WHERE { <input type="text" name="where" required> . }<br><br>
+      {{data_external}}
+      <br>
+      Example query:
+      CONSTRUCT { <i>?Building bot:hasStorey ?Storey</i> }
+      WHERE { <i>?Building bot:hasStorey ?Storey</i> . }
+      <br><br>
+      {{output}}
+      <br><br>
+      <input type="submit" value="Run query">
+    </form>
+
+  </body>
+</html>
