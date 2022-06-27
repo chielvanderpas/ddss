@@ -1,0 +1,81 @@
+{% extends 'sidebar/template_add_data.html' %}
+{% block content %}
+      <p class="py-6">Success, {{output}} is added as a bot:Site.</p>
+      <br><br>
+      <button onClick="Script1()">
+        Add a building, building storey, or space to the AIM
+      </button>
+      <script>
+        function Script1() {
+           
+            // Create a form dynamically
+            var form = document.createElement("form");
+            form.setAttribute("method", "post");
+            form.setAttribute("action", "{% url 'app:dd_step4' %}");
+
+            // Add csrf token
+            var csrf = document.createElement("input");
+            csrf.setAttribute("type", "hidden");
+            csrf.setAttribute("name", "csrfmiddlewaretoken");
+            csrf.setAttribute("value", "{{ csrf_token }}");
+            form.append(csrf);
+
+            // Create an element for the previously generated site
+            var site = document.createElement("input");
+            site.setAttribute("type", "hidden");
+            site.setAttribute("name", "site");
+            site.setAttribute("value", "{{output}}");
+            site.setAttribute("required", "true");
+            form.append(site);
+
+            // Create an input element for the subject
+            var subj = document.createElement("input");
+            subj.setAttribute("type", "text");
+            subj.setAttribute("name", "subj");
+            subj.setAttribute("placeholder", "Subject");
+            subj.setAttribute("required", "true");
+            form.append(subj);
+
+            // Create text
+            var text1 = document.createElement("a");
+            text1.textContent = " is a ";
+            form.append(text1);
+
+            // Create an input element for the object using a dropdown list
+            var obj = document.createElement("select");
+            var bot_building = document.createElement("option");
+              bot_building.setAttribute("value", "Building");
+              bot_building.textContent = "bot:Building";
+              obj.append(bot_building);
+            var bot_storey = document.createElement("option");
+              bot_storey.setAttribute("value", "Storey");
+              bot_storey.textContent = "bot:Storey";
+              obj.append(bot_storey);
+            var bot_space = document.createElement("option");
+              bot_space.setAttribute("value", "Space");
+              bot_space.textContent = "bot:Space";
+              obj.append(bot_space);
+            var bot_element = document.createElement("option");
+              bot_element.setAttribute("value", "Element");
+              bot_element.textContent = "bot:Element";
+              obj.append(bot_element);
+            obj.setAttribute("type", "text");
+            obj.setAttribute("name", "obj");
+            form.append(obj);
+
+            // Create whitespace
+            var text2 = document.createElement("a");
+            text2.textContent = " ";
+            form.append(text2);
+
+            // Create a submit button
+            var submit = document.createElement("input");
+            submit.setAttribute("type", "submit");
+            submit.setAttribute("value", "Add");
+            form.append(submit);
+
+            document.body.appendChild(form);
+
+        }
+    </script>
+{% endblock %}

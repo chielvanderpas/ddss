@@ -1,0 +1,90 @@
+{% extends 'sidebar/template_add_data.html' %}
+{% block content %}
+<p class="text-gray-900 text-base no-underline hover:no-underline font-extrabold text-xl" align="center"><b><u>Add a new event</u></b></p>
+<br>
+{{output}}
+<br><br>
+    <form method="post" id="form">
+      {% csrf_token %}
+      <fieldset></fieldset>
+      <label for="event_type">Event type:</label>
+      <select type="text" id="event_type" name="event_type" required align="left">
+         <option value="" disabled selected>Select event type</option>
+         <option value="" disabled></option>
+         <optgroup label="Maintain">
+            <option value="Maintenance">Maintenance</option>
+            <option value="Survey">Survey</option>
+            <option value="Operations">Operations</option>
+            <option value="Inspections">Inspections</option>
+         </optgroup>
+         <optgroup label="Renewal">
+            <option value="Renewal">Renewal</option>
+            <option value="Refurbish">Refurbish</option>
+         </optgroup>
+         <optgroup label="End of Life">
+            <option value="EndOfLife">End of Life</option>
+         </optgroup>
+         <optgroup label="Acquire">
+            <option value="Acquire">Acquire</option>
+         </optgroup>
+         <option value="" disabled></option>
+      </select>   
+      <br><br>
+      {{data_external}}
+      <label for="event_description">Event description:</label>
+      <textarea type="text" id="event_description" name="event_description" placeholder="Add description of the event" rows="4" cols="50" autofocus required align="left"></textarea>
+      <br><br>
+      {{data_external}}
+      <label for="startdatetime">Start date & time:</label>
+      <input type="datetime-local" id="startdatetime" name="startdatetime" required align="left">
+      <br><br>
+      {{data_external}}
+      <label for="enddatetime">End date & time:</label>
+      <input type="datetime-local" id="enddatetime" name="enddatetime" align="left">
+      <a>*</a>
+      <br><br>
+      {{data_external}}
+      <label for="related_actor">Related actor:</label>
+      <select type="text" id="related_actor" name="related_actor" required align="left">
+         <option value="" disabled selected>Select a related actor</option>
+         <option value="" disabled></option>
+         {% for actor in existing_actors %}
+         <option value="{{ actor.id }}">{{ actor.name }}</option>
+         {% endfor %}
+      </select>   
+      <br><br>
+      {{data_external}}
+      <label for="hassuperevent">Check if this event is a subevent of another event</label>
+      <input type="checkbox" id="hassuperevent" name="hassupersubevent" align="left">
+      <br><br>
+      <label style="visibility:hidden;" id="label_super_event" for="super_event">Super event:</label>
+      <select style="visibility:hidden;" type="text" id="super_event" name="super_event" align="left">
+         <option value="" disabled selected>Select the super event of this event</option>
+         <option value="" disabled></option>
+         {% for event in existing_events %} 
+         <option value="{{ event.id }}">{{ event.list_text }}</option>
+         {% endfor %}
+      </select>
+      <br><br>
+      {{data_external}}
+      <input formaction="{% url 'app:dd_create_extra_event_1' %}" type="submit" value="Add another event">
+      <input formaction="{% url 'app:dd_create_new_event_2' %}" type="submit" value="Continue">
+    </form>
+    <script>
+      const checkbox = document.getElementById('hassuperevent');
+      const box = document.getElementById('super_event');
+      const box_label = document.getElementById('label_super_event');
+       
+      checkbox.addEventListener('click', function handleClick() {
+         if (checkbox.checked) {
+            box.style.visibility = 'visible';
+            box_label.style.visibility = 'visible';
+         } else {
+            box.style.visibility = 'hidden';
+            box_label.style.visibility = 'hidden';
+         }
+      });
+    </script>
+    <br><br><br><br>
+    <p class="py-4 text-gray-600 text-sm">* In case no end date & time are defined, the start date & time is equal to the date & time the event occured.</p>
+{% endblock %}

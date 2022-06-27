@@ -1,0 +1,649 @@
+@prefix bot: <https://w3id.org/bot#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix bag2: <https://bag2.basisregistraties.overheid.nl/bag/def/> .
+@prefix ddss: <https://github.com/chielvanderpas/ddss#> .
+@prefix foaf: <http://xmlns.com/foaf/spec/#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@base <https://github.com/chielvanderpas/ddss#> .
+
+<https://github.com/chielvanderpas/ddss> rdf:type owl:Ontology ;
+                                          owl:imports <https://w3id.org/bot-0.3.2> .
+
+#################################################################
+#    Object Properties
+#################################################################
+
+###  https://bag2.basisregistraties.overheid.nl/bag/def/hasDocumentationType
+bag2:hasDocumentationType rdf:type owl:ObjectProperty ;
+                          rdfs:domain ddss:Document ;
+                          rdfs:range bag2:DocumentationType .
+
+
+###  https://github.com/chielvanderpas/ddss#canAccess
+ddss:canAccess rdf:type owl:ObjectProperty ;
+               rdfs:domain ddss:Actor ;
+               rdfs:range ddss:Document ,
+                          ddss:Event ,
+                          bot:Element ,
+                          bot:Zone .
+
+
+###  https://github.com/chielvanderpas/ddss#concernsActor
+ddss:concernsActor rdf:type owl:ObjectProperty ;
+                   rdfs:domain ddss:DocumentInteraction ;
+                   rdfs:range ddss:Actor .
+
+
+###  https://github.com/chielvanderpas/ddss#concernsDocument
+ddss:concernsDocument rdf:type owl:ObjectProperty ;
+                      rdfs:domain ddss:DocumentInteraction ;
+                      rdfs:range ddss:Document .
+
+
+###  https://github.com/chielvanderpas/ddss#contains
+ddss:contains rdf:type owl:ObjectProperty ,
+                       owl:SymmetricProperty ;
+              rdfs:domain ddss:DataDrop ;
+              rdfs:range ddss:DocumentInteraction .
+
+
+###  https://github.com/chielvanderpas/ddss#contentType
+ddss:contentType rdf:type owl:ObjectProperty ;
+                 rdfs:domain ddss:Document ;
+                 rdfs:range ddss:ContentType .
+
+
+###  https://github.com/chielvanderpas/ddss#hasContentType
+ddss:hasContentType rdf:type owl:ObjectProperty ;
+                    rdfs:domain ddss:Document ;
+                    rdfs:range ddss:ContentType .
+
+
+###  https://github.com/chielvanderpas/ddss#hasCopy
+ddss:hasCopy rdf:type owl:ObjectProperty ;
+             rdfs:domain ddss:Document ;
+             rdfs:range ddss:CopyInOriginalFormat .
+
+
+###  https://github.com/chielvanderpas/ddss#hasCreationSoftware
+ddss:hasCreationSoftware rdf:type owl:ObjectProperty ;
+                         rdfs:domain ddss:Document ;
+                         rdfs:range ddss:CreationSoftware .
+
+
+###  https://github.com/chielvanderpas/ddss#hasFork
+ddss:hasFork rdf:type owl:ObjectProperty ;
+             rdfs:subPropertyOf bot:adjacentZone ;
+             rdfs:domain ddss:AIM ;
+             rdfs:range ddss:AIM .
+
+
+###  https://github.com/chielvanderpas/ddss#hasPreviousVersion
+ddss:hasPreviousVersion rdf:type owl:ObjectProperty ;
+                        rdfs:domain ddss:Document ;
+                        rdfs:range ddss:Document .
+
+
+###  https://github.com/chielvanderpas/ddss#hasRepresentationDocumentation
+ddss:hasRepresentationDocumentation rdf:type owl:ObjectProperty ;
+                                    rdfs:domain ddss:Document ;
+                                    rdfs:range ddss:RepresentationInformationDocument .
+
+
+###  https://github.com/chielvanderpas/ddss#hasSharingStatus
+ddss:hasSharingStatus rdf:type owl:ObjectProperty ;
+                      rdfs:domain ddss:Document ,
+                                  ddss:Event ,
+                                  bot:Element ,
+                                  bot:Zone ;
+                      rdfs:range ddss:SharingStatus .
+
+
+###  https://github.com/chielvanderpas/ddss#hasStatus
+ddss:hasStatus rdf:type owl:ObjectProperty ;
+               rdfs:domain ddss:Document ;
+               rdfs:range ddss:Status .
+
+
+###  https://github.com/chielvanderpas/ddss#hasSubEvent
+ddss:hasSubEvent rdf:type owl:ObjectProperty ;
+                 rdfs:domain ddss:Event ;
+                 rdfs:range ddss:Event .
+
+
+###  https://github.com/chielvanderpas/ddss#involves
+ddss:involves rdf:type owl:ObjectProperty ;
+              rdfs:domain ddss:Event ;
+              rdfs:range ddss:Actor .
+
+
+###  https://github.com/chielvanderpas/ddss#isForkOf
+ddss:isForkOf rdf:type owl:ObjectProperty ;
+              rdfs:domain ddss:AIM ;
+              rdfs:range ddss:AIM .
+
+
+###  https://github.com/chielvanderpas/ddss#locatedAt
+ddss:locatedAt rdf:type owl:ObjectProperty ;
+               rdfs:domain bot:Building ,
+                           bot:Site ;
+               rdfs:range bag2:Pand .
+
+
+###  https://github.com/chielvanderpas/ddss#partOf
+ddss:partOf rdf:type owl:ObjectProperty ;
+            rdfs:domain ddss:Document ,
+                        ddss:Event ,
+                        bot:Element ,
+                        bot:Zone ;
+            rdfs:range ddss:AIM .
+
+
+###  https://github.com/chielvanderpas/ddss#relatesToBuilding
+ddss:relatesToBuilding rdf:type owl:ObjectProperty ,
+                                owl:SymmetricProperty ;
+                       rdfs:domain ddss:Document ;
+                       rdfs:range bot:Element ,
+                                  bot:Zone .
+
+
+###  https://github.com/chielvanderpas/ddss#relatesToEvent
+ddss:relatesToEvent rdf:type owl:ObjectProperty ,
+                             owl:SymmetricProperty ;
+                    rdfs:domain ddss:DataDrop ;
+                    rdfs:range ddss:Event .
+
+
+###  https://github.com/chielvanderpas/ddss#uploadedBy
+ddss:uploadedBy rdf:type owl:ObjectProperty ;
+                rdfs:domain ddss:DataDrop ;
+                rdfs:range ddss:Actor .
+
+
+#################################################################
+#    Data properties
+#################################################################
+
+###  https://github.com/chielvanderpas/ddss#endedAt
+ddss:endedAt rdf:type owl:DatatypeProperty ;
+             rdfs:domain ddss:Event ;
+             rdfs:range xsd:dateTime .
+
+
+###  https://github.com/chielvanderpas/ddss#hasDescription
+ddss:hasDescription rdf:type owl:DatatypeProperty ;
+                    rdfs:domain ddss:Document ,
+                                ddss:Event ;
+                    rdfs:range rdfs:Literal .
+
+
+###  https://github.com/chielvanderpas/ddss#hasEmailAddress
+ddss:hasEmailAddress rdf:type owl:DatatypeProperty ;
+                     rdfs:domain ddss:Actor ;
+                     rdfs:range rdfs:Literal .
+
+
+###  https://github.com/chielvanderpas/ddss#hasFileFormat
+ddss:hasFileFormat rdf:type owl:DatatypeProperty ;
+                   rdfs:domain ddss:CopyInOriginalFormat ;
+                   rdfs:range rdfs:Literal .
+
+
+###  https://github.com/chielvanderpas/ddss#hasFileName
+ddss:hasFileName rdf:type owl:DatatypeProperty ;
+                 rdfs:domain ddss:Document ;
+                 rdfs:range rdfs:Literal .
+
+
+###  https://github.com/chielvanderpas/ddss#hasIfcGuid
+ddss:hasIfcGuid rdf:type owl:DatatypeProperty ;
+                rdfs:domain ddss:IFC ,
+                            bot:Element ,
+                            bot:Zone ;
+                rdfs:range rdfs:Literal .
+
+
+###  https://github.com/chielvanderpas/ddss#hasModelName
+ddss:hasModelName rdf:type owl:DatatypeProperty ;
+                  rdfs:domain ddss:AIM ;
+                  rdfs:range rdfs:Literal .
+
+
+###  https://github.com/chielvanderpas/ddss#hasName
+ddss:hasName rdf:type owl:DatatypeProperty ;
+             rdfs:domain ddss:Actor ;
+             rdfs:range rdfs:Literal .
+
+
+###  https://github.com/chielvanderpas/ddss#hasNamespace
+ddss:hasNamespace rdf:type owl:DatatypeProperty ;
+                  rdfs:domain ddss:AIM ;
+                  rdfs:range rdfs:Literal .
+
+
+###  https://github.com/chielvanderpas/ddss#hasPhoneNumber
+ddss:hasPhoneNumber rdf:type owl:DatatypeProperty ;
+                    rdfs:domain ddss:Actor ;
+                    rdfs:range rdfs:Literal .
+
+
+###  https://github.com/chielvanderpas/ddss#hasPreservationUntilDate
+ddss:hasPreservationUntilDate rdf:type owl:DatatypeProperty ;
+                              rdfs:domain ddss:Document ;
+                              rdfs:range xsd:dateTime .
+
+
+###  https://github.com/chielvanderpas/ddss#hasRole
+ddss:hasRole rdf:type owl:DatatypeProperty ;
+             rdfs:domain ddss:Actor ;
+             rdfs:range rdfs:Literal .
+
+
+###  https://github.com/chielvanderpas/ddss#hasUniqueIdentifier
+ddss:hasUniqueIdentifier rdf:type owl:DatatypeProperty ;
+                         rdfs:domain ddss:Document ;
+                         rdfs:range rdfs:Literal .
+
+
+###  https://github.com/chielvanderpas/ddss#hasVersion
+ddss:hasVersion rdf:type owl:DatatypeProperty ;
+                rdfs:domain ddss:CreationSoftware ;
+                rdfs:range rdfs:Literal .
+
+
+###  https://github.com/chielvanderpas/ddss#occurredAt
+ddss:occurredAt rdf:type owl:DatatypeProperty ;
+                rdfs:subPropertyOf owl:topDataProperty ;
+                rdfs:domain ddss:DataDrop ;
+                rdfs:range xsd:dateTime .
+
+
+###  https://github.com/chielvanderpas/ddss#startedAt
+ddss:startedAt rdf:type owl:DatatypeProperty ;
+               rdfs:domain ddss:Event ;
+               rdfs:range xsd:dateTime .
+
+
+#################################################################
+#    Classes
+#################################################################
+
+###  http://xmlns.com/foaf/spec/#Person
+foaf:Person rdf:type owl:Class .
+
+
+###  https://bag2.basisregistraties.overheid.nl/bag/def/DocumentationType
+bag2:DocumentationType rdf:type owl:Class .
+
+
+###  https://bag2.basisregistraties.overheid.nl/bag/def/Pand
+bag2:Pand rdf:type owl:Class .
+
+
+###  https://github.com/chielvanderpas/ddss#AIM
+ddss:AIM rdf:type owl:Class ;
+         owl:equivalentClass [ rdf:type owl:Restriction ;
+                               owl:onProperty ddss:hasModelName ;
+                               owl:cardinality "1"^^xsd:nonNegativeInteger
+                             ] ,
+                             [ rdf:type owl:Restriction ;
+                               owl:onProperty ddss:hasNamespace ;
+                               owl:cardinality "1"^^xsd:nonNegativeInteger
+                             ] .
+
+
+###  https://github.com/chielvanderpas/ddss#Acquire
+ddss:Acquire rdf:type owl:Class ;
+             rdfs:subClassOf ddss:Event .
+
+
+###  https://github.com/chielvanderpas/ddss#Actor
+ddss:Actor rdf:type owl:Class ;
+           owl:equivalentClass [ rdf:type owl:Restriction ;
+                                 owl:onProperty ddss:hasEmailAddress ;
+                                 owl:minCardinality "1"^^xsd:nonNegativeInteger
+                               ] ,
+                               [ rdf:type owl:Restriction ;
+                                 owl:onProperty ddss:hasPhoneNumber ;
+                                 owl:minCardinality "1"^^xsd:nonNegativeInteger
+                               ] ,
+                               [ rdf:type owl:Restriction ;
+                                 owl:onProperty ddss:hasName ;
+                                 owl:cardinality "1"^^xsd:nonNegativeInteger
+                               ] ;
+           rdfs:subClassOf foaf:Person .
+
+
+###  https://github.com/chielvanderpas/ddss#AlphanumericalInformation
+ddss:AlphanumericalInformation rdf:type owl:Class ;
+                               rdfs:subClassOf ddss:ContentType .
+
+
+###  https://github.com/chielvanderpas/ddss#Archived
+ddss:Archived rdf:type owl:Class ;
+              rdfs:subClassOf ddss:Status .
+
+
+###  https://github.com/chielvanderpas/ddss#CSV
+ddss:CSV rdf:type owl:Class ;
+         rdfs:subClassOf ddss:Document .
+
+
+###  https://github.com/chielvanderpas/ddss#ContentType
+ddss:ContentType rdf:type owl:Class .
+
+
+###  https://github.com/chielvanderpas/ddss#CopyInOriginalFormat
+ddss:CopyInOriginalFormat rdf:type owl:Class ;
+                          owl:equivalentClass [ rdf:type owl:Restriction ;
+                                                owl:onProperty ddss:hasFileFormat ;
+                                                owl:cardinality "1"^^xsd:nonNegativeInteger
+                                              ] .
+
+
+###  https://github.com/chielvanderpas/ddss#Creation
+ddss:Creation rdf:type owl:Class ;
+              rdfs:subClassOf ddss:DocumentInteraction .
+
+
+###  https://github.com/chielvanderpas/ddss#CreationSoftware
+ddss:CreationSoftware rdf:type owl:Class ;
+                      owl:equivalentClass [ rdf:type owl:Restriction ;
+                                            owl:onProperty ddss:hasVersion ;
+                                            owl:cardinality "1"^^xsd:nonNegativeInteger
+                                          ] .
+
+
+###  https://github.com/chielvanderpas/ddss#DataDrop
+ddss:DataDrop rdf:type owl:Class ;
+              owl:equivalentClass [ rdf:type owl:Restriction ;
+                                    owl:onProperty ddss:contains ;
+                                    owl:minCardinality "1"^^xsd:nonNegativeInteger
+                                  ] ,
+                                  [ rdf:type owl:Restriction ;
+                                    owl:onProperty ddss:uploadedBy ;
+                                    owl:cardinality "1"^^xsd:nonNegativeInteger
+                                  ] ,
+                                  [ rdf:type owl:Restriction ;
+                                    owl:onProperty ddss:occurredAt ;
+                                    owl:cardinality "1"^^xsd:nonNegativeInteger
+                                  ] .
+
+
+###  https://github.com/chielvanderpas/ddss#Document
+ddss:Document rdf:type owl:Class ;
+              owl:equivalentClass [ rdf:type owl:Restriction ;
+                                    owl:onProperty bag2:hasDocumentationType ;
+                                    owl:minCardinality "1"^^xsd:nonNegativeInteger
+                                  ] ,
+                                  [ rdf:type owl:Restriction ;
+                                    owl:onProperty ddss:hasContentType ;
+                                    owl:minCardinality "1"^^xsd:nonNegativeInteger
+                                  ] ,
+                                  [ rdf:type owl:Restriction ;
+                                    owl:onProperty ddss:hasCreationSoftware ;
+                                    owl:minCardinality "1"^^xsd:nonNegativeInteger
+                                  ] ,
+                                  [ rdf:type owl:Restriction ;
+                                    owl:onProperty ddss:hasRepresentationDocumentation ;
+                                    owl:minCardinality "1"^^xsd:nonNegativeInteger
+                                  ] ,
+                                  [ rdf:type owl:Restriction ;
+                                    owl:onProperty ddss:hasStatus ;
+                                    owl:cardinality "1"^^xsd:nonNegativeInteger
+                                  ] ,
+                                  [ rdf:type owl:Restriction ;
+                                    owl:onProperty ddss:hasContentType ;
+                                    owl:maxCardinality "3"^^xsd:nonNegativeInteger
+                                  ] ,
+                                  [ rdf:type owl:Restriction ;
+                                    owl:onProperty ddss:hasFileName ;
+                                    owl:cardinality "1"^^xsd:nonNegativeInteger
+                                  ] ,
+                                  [ rdf:type owl:Restriction ;
+                                    owl:onProperty ddss:hasPreservationUntilDate ;
+                                    owl:cardinality "1"^^xsd:nonNegativeInteger
+                                  ] .
+
+
+###  https://github.com/chielvanderpas/ddss#DocumentInteraction
+ddss:DocumentInteraction rdf:type owl:Class ;
+                         owl:equivalentClass [ rdf:type owl:Restriction ;
+                                               owl:onProperty ddss:concernsActor ;
+                                               owl:minCardinality "1"^^xsd:nonNegativeInteger
+                                             ] ,
+                                             [ rdf:type owl:Restriction ;
+                                               owl:onProperty ddss:concernsDocument ;
+                                               owl:cardinality "1"^^xsd:nonNegativeInteger
+                                             ] .
+
+
+###  https://github.com/chielvanderpas/ddss#Documentation
+ddss:Documentation rdf:type owl:Class ;
+                   rdfs:subClassOf ddss:ContentType .
+
+
+###  https://github.com/chielvanderpas/ddss#Edit
+ddss:Edit rdf:type owl:Class ;
+          rdfs:subClassOf ddss:DocumentInteraction .
+
+
+###  https://github.com/chielvanderpas/ddss#EndOfLife
+ddss:EndOfLife rdf:type owl:Class ;
+               rdfs:subClassOf ddss:Event .
+
+
+###  https://github.com/chielvanderpas/ddss#Event
+ddss:Event rdf:type owl:Class ;
+           owl:equivalentClass [ rdf:type owl:Restriction ;
+                                 owl:onProperty ddss:involves ;
+                                 owl:minCardinality "1"^^xsd:nonNegativeInteger
+                               ] ,
+                               [ rdf:type owl:Restriction ;
+                                 owl:onProperty ddss:startedAt ;
+                                 owl:cardinality "1"^^xsd:nonNegativeInteger
+                               ] ,
+                               [ rdf:type owl:Restriction ;
+                                 owl:onProperty ddss:endedAt ;
+                                 owl:maxCardinality "1"^^xsd:nonNegativeInteger
+                               ] .
+
+
+###  https://github.com/chielvanderpas/ddss#GeometricalInformation
+ddss:GeometricalInformation rdf:type owl:Class ;
+                            rdfs:subClassOf ddss:ContentType .
+
+
+###  https://github.com/chielvanderpas/ddss#IFC
+ddss:IFC rdf:type owl:Class ;
+         rdfs:subClassOf ddss:Document .
+
+
+###  https://github.com/chielvanderpas/ddss#IFC2x3
+ddss:IFC2x3 rdf:type owl:Class ;
+            rdfs:subClassOf ddss:IFC ;
+            owl:disjointWith ddss:IFC4 .
+
+
+###  https://github.com/chielvanderpas/ddss#IFC4
+ddss:IFC4 rdf:type owl:Class ;
+          rdfs:subClassOf ddss:IFC .
+
+
+###  https://github.com/chielvanderpas/ddss#Inspections
+ddss:Inspections rdf:type owl:Class ;
+                 rdfs:subClassOf ddss:Maintain .
+
+
+###  https://github.com/chielvanderpas/ddss#Internal
+ddss:Internal rdf:type owl:Class ;
+              rdfs:subClassOf ddss:SharingStatus .
+
+
+###  https://github.com/chielvanderpas/ddss#JPEG
+ddss:JPEG rdf:type owl:Class ;
+          rdfs:subClassOf ddss:Document .
+
+
+###  https://github.com/chielvanderpas/ddss#Maintain
+ddss:Maintain rdf:type owl:Class ;
+              rdfs:subClassOf ddss:Event .
+
+
+###  https://github.com/chielvanderpas/ddss#Maintenance
+ddss:Maintenance rdf:type owl:Class ;
+                 rdfs:subClassOf ddss:Maintain .
+
+
+###  https://github.com/chielvanderpas/ddss#Operations
+ddss:Operations rdf:type owl:Class ;
+                rdfs:subClassOf ddss:Maintain .
+
+
+###  https://github.com/chielvanderpas/ddss#PCD
+ddss:PCD rdf:type owl:Class ;
+         rdfs:subClassOf ddss:Document .
+
+
+###  https://github.com/chielvanderpas/ddss#PDF
+ddss:PDF rdf:type owl:Class ;
+         rdfs:subClassOf ddss:Document .
+
+
+###  https://github.com/chielvanderpas/ddss#PNG
+ddss:PNG rdf:type owl:Class ;
+         rdfs:subClassOf ddss:Document .
+
+
+###  https://github.com/chielvanderpas/ddss#Public
+ddss:Public rdf:type owl:Class ;
+            rdfs:subClassOf ddss:SharingStatus .
+
+
+###  https://github.com/chielvanderpas/ddss#Published
+ddss:Published rdf:type owl:Class ;
+               rdfs:subClassOf ddss:Status .
+
+
+###  https://github.com/chielvanderpas/ddss#Refurbish
+ddss:Refurbish rdf:type owl:Class ;
+               rdfs:subClassOf ddss:Renew ;
+               owl:disjointWith ddss:Renewal .
+
+
+###  https://github.com/chielvanderpas/ddss#Renew
+ddss:Renew rdf:type owl:Class ;
+           rdfs:subClassOf ddss:Event .
+
+
+###  https://github.com/chielvanderpas/ddss#Renewal
+ddss:Renewal rdf:type owl:Class ;
+             rdfs:subClassOf ddss:Renew .
+
+
+###  https://github.com/chielvanderpas/ddss#RepresentationInformationDocument
+ddss:RepresentationInformationDocument rdf:type owl:Class .
+
+
+###  https://github.com/chielvanderpas/ddss#Shared
+ddss:Shared rdf:type owl:Class ;
+            rdfs:subClassOf ddss:Status .
+
+
+###  https://github.com/chielvanderpas/ddss#SharedToExternalParty
+ddss:SharedToExternalParty rdf:type owl:Class ;
+                           rdfs:subClassOf ddss:SharedToSpecific .
+
+
+###  https://github.com/chielvanderpas/ddss#SharedToInternalGroup
+ddss:SharedToInternalGroup rdf:type owl:Class ;
+                           rdfs:subClassOf ddss:SharedToSpecific .
+
+
+###  https://github.com/chielvanderpas/ddss#SharedToInternalPerson
+ddss:SharedToInternalPerson rdf:type owl:Class ;
+                            rdfs:subClassOf ddss:SharedToSpecific .
+
+
+###  https://github.com/chielvanderpas/ddss#SharedToSpecific
+ddss:SharedToSpecific rdf:type owl:Class ;
+                      rdfs:subClassOf ddss:SharingStatus .
+
+
+###  https://github.com/chielvanderpas/ddss#SharingStatus
+ddss:SharingStatus rdf:type owl:Class .
+
+
+###  https://github.com/chielvanderpas/ddss#Status
+ddss:Status rdf:type owl:Class .
+
+
+###  https://github.com/chielvanderpas/ddss#StatusChange
+ddss:StatusChange rdf:type owl:Class ;
+                  rdfs:subClassOf ddss:DocumentInteraction .
+
+
+###  https://github.com/chielvanderpas/ddss#Survey
+ddss:Survey rdf:type owl:Class ;
+            rdfs:subClassOf ddss:Maintain .
+
+
+###  https://github.com/chielvanderpas/ddss#WorkInProgress
+ddss:WorkInProgress rdf:type owl:Class ;
+                    rdfs:subClassOf ddss:Status .
+
+
+#################################################################
+#    General axioms
+#################################################################
+
+[ rdf:type owl:AllDisjointClasses ;
+  owl:members ( ddss:Acquire
+                ddss:EndOfLife
+                ddss:Maintain
+                ddss:Renew
+              )
+] .
+
+
+[ rdf:type owl:AllDisjointClasses ;
+  owl:members ( ddss:Archived
+                ddss:Published
+                ddss:Shared
+                ddss:WorkInProgress
+              )
+] .
+
+
+[ rdf:type owl:AllDisjointClasses ;
+  owl:members ( ddss:CSV
+                ddss:IFC
+                ddss:JPEG
+                ddss:PCD
+                ddss:PDF
+                ddss:PNG
+              )
+] .
+
+
+[ rdf:type owl:AllDisjointClasses ;
+  owl:members ( ddss:Inspections
+                ddss:Maintenance
+                ddss:Operations
+                ddss:Survey
+              )
+] .
+
+
+[ rdf:type owl:AllDisjointClasses ;
+  owl:members ( ddss:Internal
+                ddss:Public
+                ddss:SharedToSpecific
+              )
+] .
+
+
+###  Generated by the OWL API (version 4.5.9.2019-02-01T07:24:44Z) https://github.com/owlcs/owlapi

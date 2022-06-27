@@ -1,0 +1,29 @@
+{% extends 'sidebar/template_none.html' %}
+{% block content %}
+<p class="py-3">{{welcome_message}}</p>  
+<blockquote class="border-l-4 border-red-500 my-8 pl-8 md:pl-12">
+   <b>My data:</b>
+   <br>
+   Name: <i>{{full_name}}</i>
+   <br>
+   E-mail: <i>{{email}}</i>
+   <br>
+   Phone number: <i>{{phone_number}}</i>
+</blockquote>
+<blockquote class="border-l-4 border-red-500 my-8 pl-8 md:pl-12">
+   <b>DDSS settings:</b>
+   <br>
+   SPARQL endpoint 1: <i>{{sparql_endpoint_1}}</i>
+   <br>
+   SPARQL endpoint 2: <i>{{sparql_endpoint_2}}</i>
+   <br>
+   Storage location of documents: <i>{{document_storage_location}}</i>
+   <br>
+   AIM default namespace: <i>{{aim_default_namespace}}</i>
+   <br><br>
+   <a class="py-4 text-gray-600 text-sm"><i>Settings for the DDSS system can be changed in the settings.py instance of the DDSS system.</i></a>
+</blockquote>
+<form action="{% url 'app:org' %}">
+   <input type="submit" value="Edit organisational structure"/>
+</form>
+{% endblock %}

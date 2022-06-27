@@ -1,0 +1,10 @@
+{% extends 'auth_template.html' %}
+{% block content %}
+<p class="py-6">You have been logged out successfully!</p>
+<br><br>
+<form>
+   <input formaction="{% url 'app:register' %}" type="submit" value="Register"/>
+   <input formaction="{% url 'app:login' %}" type="submit" value="Login"/>
+</form>
+<br><br><br><br>
+{% endblock %}

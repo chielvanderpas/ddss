@@ -1,0 +1,44 @@
+{% extends 'auth_template.html' %}
+{% block content %}
+  <p class="py-6">Welcome, please fill in your personal details to create an account.</p>
+      <form action="{% url 'app:register_proceed' %}" method="post">
+         {% csrf_token %}
+         <fieldset>
+         <label for="first_name">First name</label>
+         <input type="text" id="first_name" name="first_name" required align="left"><br><br>
+         {{data_external}}
+         <label for="last_name">Last name:</label>
+         <input type="text" id="last_name" name="last_name" required align="left"><br><br>
+         {{data_external}}
+         <label for="email">E-mail address:</label>
+         <input type="email" id="email" name="email" required align="left" placeholder="name@provider.com"><br><br>
+         {{data_external}}
+         <label for="phone_number">Phone number:</label>
+         <input type="tel" id="phone_number" name="phone_number" required align="left" placeholder="+31612345678" pattern="+[0-9]"><br><br>
+         {{data_external}}
+         <label for="password">Password:</label>
+         <input type="password" id="password" name="password" required align="left"><br><br>
+         {{data_external}}
+         <label for="confirm_password">Confirm password:</label>
+         <input type="password" id="confirm_password" name="confirm_password" required align="left"><br><br>
+         {{data_external}}
+         <script>
+            var password = document.getElementById("password"),
+            confirm_password = document.getElementById("confirm_password");
+    
+            function validatePassword(){
+               confirm_password.setCustomValidity( password.value != 
+               confirm_password.value ? "Passwords do not match!" : '');
+            }
+
+            password.onchange = validatePassword;
+            confirm_password.onkeyup = validatePassword;
+         </script>
+         <br>
+         <input type="submit" value="Register">
+         </fieldset>
+       </form>
+       <br><br>
+       {{output}}
+       <br><br>
+{% endblock %}

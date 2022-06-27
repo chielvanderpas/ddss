@@ -1,0 +1,13 @@
+{% extends 'sidebar/template_add_data.html' %}
+{% block content %}
+<p class="text-gray-900 text-base no-underline hover:no-underline font-extrabold text-xl" align="center"><b><u>Start data drop</u></b></p>
+<div style="text-align: center;">
+<br>
+<p class="py-6">Would you like to create a new AIM, or would you like to add data to an already existing AIM?</p>
+<br><br>
+<form>
+    <input formaction="{% url 'app:dd_create_new_aim_1' %}" type="submit" value="Create new AIM"/>
+    <input {{disabled}} formaction="{% url 'app:dd_select_existing_aim_1' %}" type="submit" value="Select existing AIM"/>
+</form>
+</div>
+{% endblock %}

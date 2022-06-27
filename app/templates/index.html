@@ -1,0 +1,14 @@
+{% extends 'sidebar/template_home.html' %}
+{% block content %}
+<p class="py-3">{{welcome_message}}</p>
+<p class="py-3">{{output}}</p>  
+<p class="py-6">
+    👋 Welcome fellow <a class="text-red-500 no-underline hover:underline" href="https://www.tailwindcss.com">Tailwind CSS</a> fan.  This starter template provides a starting point to create your own helpdesk / faq / knowledgebase articles using Tailwind CSS and vanilla Javascript.
+</p>
+<p class="py-6">
+   The basic help article layout is available and all using the default Tailwind CSS classes (although there are a few hardcoded style tags). If you are going to use this in your project, you will want to convert the classes into components.
+</p>
+<blockquote class="border-l-4 border-red-500 italic my-8 pl-8 md:pl-12">
+   Example of blockquote - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam at ipsum eu nunc commodo posuere et sit amet ligula.
+</blockquote>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends 'sidebar/template_none.html' %}
+{% block content %}
+<p class="py-3">{{welcome_message}}</p>
+{% for actor in output %}  
+<blockquote class="border-l-4 border-red-500 my-8 pl-8 md:pl-12">
+     <b>Actor</b>
+     <br>
+     Actor ID: <i>{{actor.id}}</i>
+     <br>
+     Name: <i>{{actor.name}}</i>
+     <br>
+     E-mail: <i>{{actor.email}}</i>
+     <br>
+     Phone number: <i>{{actor.phone_number}}</i>
+</blockquote>
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends 'sidebar/template_add_data.html' %}
+{% block content %}
+<p class="text-gray-900 text-base no-underline hover:no-underline font-extrabold text-xl" align="center"><b><u>Upload file</u></b></p>
+<div style="text-align: center;">
+<br>
+    {{output}}
+<br><br>
+<form method="post" id="form" enctype="multipart/form-data">
+    {% csrf_token %}
+    <a>Select a file for upload:</a>
+    <br><br>
+    <input required type="file" id="file" name="file">
+    {{data_external}}
+    <br><br><br>
+    <a>Add a copy of the file in its original format:</a>
+    <br><br>
+    <input type="file" id="copy_in_original_format" name="copy_in_original_format">
+    {{data_external}}
+    <br><br><br>
+    <input formaction="{% url 'app:dd_upload_file_2' %}" type="submit" value="Upload"/>
+</form>
+<br><br><br>
+<b><i>{{error_message}}</i></b>
+<br><br>
+</div>
+{% endblock %}

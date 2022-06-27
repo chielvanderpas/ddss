@@ -1,0 +1,123 @@
+{% extends 'sidebar/template_add_data.html' %}
+{% block content %}
+<p class="text-gray-900 text-base no-underline hover:no-underline font-extrabold text-xl" align="center"><b><u>Upload file</u></b></p>
+<div style="text-align: center;">
+<br>
+{{ message }}
+<br><br>
+<form method="post" id="form">
+    {% csrf_token %}
+    {% for document in output %}
+    <label for="unique_document_id">Unique document ID:</label>
+    <input style="background-color: lightgray;" size="40" type="text" id="unique_document_id" name="unique_document_id" value="{{ document.id }}" readonly align="left">
+    <br><br>
+    <label for="document_type">Document type:</label>
+    <input style="background-color: lightgray;" size="40" type="text" id="document_type" name="document_type" value="{{ document.file_type }}" readonly align="left">
+    <br><br>
+    <label for="document_name">Document name:</label>
+    <input style="background-color: lightgray;" size="40" type="text" id="document_name" name="document_name" value="{{ document.file_name }}" readonly align="left">
+    <br><br>
+    <label for="document_storage_location">Document storage location:</label>
+    <input style="background-color: lightgray;" size="40" type="text" id="document_storage_location" name="document_storage_location" value="{{ document.storage_location }}" readonly align="left">
+    <br><br>
+    {% if document.copy_id != '' %}
+    <label for="copy_id">Unique document ID of copy:</label>
+    <input style="background-color: lightgray;" size="40" type="text" id="copy_id" name="copy_id" value="{{ document.copy_id }}" readonly align="left">
+    <br><br>
+    <label for="copy_type">Document type of copy:</label>
+    <input style="background-color: lightgray;" size="40" type="text" id="copy_type" name="copy_type" value="{{ document.copy_file_type }}" readonly align="left">
+    <br><br>
+    <label for="copy_name">Document name of copy:</label>
+    <input style="background-color: lightgray;" size="40" type="text" id="copy_name" name="copy_name" value="{{ document.copy_file_name }}" readonly align="left">
+    <br><br>
+    <label for="copy_storage_location">Document storage location of copy:</label>
+    <input style="background-color: lightgray;" size="40" type="text" id="copy_storage_location" name="copy_storage_location" value="{{ document.copy_storage_location }}" readonly align="left">
+    <br><br>
+    {% endif %}
+    {% if document.prev_version_id != '' %}
+    <label for="prev_version_id">Unique document ID of previous version:</label>
+    <input style="background-color: lightgray;" size="40" type="text" id="prev_version_id" name="prev_version_id" value="{{ document.prev_version_id }}" readonly align="left">
+    <br><br>
+    <label for="prev_version_status">Document status of previous version:</label>
+    <input style="background-color: lightgray;" size="40" type="text" id="prev_version_status" name="prev_version_status" value="{{ document.prev_version_status }}" readonly align="left">
+    <br><br>
+    {% endif %}
+    {% endfor %}
+    <label for="document_description">Document description:</label>
+    <textarea type="text" id="document_description" name="document_description" rows="4" cols="40" required align="left"></textarea>
+    {{data_external}}
+    <br><br>
+    <label for="document_unique_identifier">Optional unique document identifier:</label>
+    <input size="40" type="text" id="document_unique_identifier" name="document_unique_identifier" autofocus align=""left>
+    {{data_external}}
+    <br><br>
+    <label for="document_creation_software">Creation software:</label>
+    <input size="40" type="text" list="software_options" id="document_creation_software" name="document_creation_software" placeholder="Select or type yourself" required align="left">
+    {% for document in output %}
+    {% if document.file_type == 'ifc' %}
+    <datalist id="software_options">
+        <option value="Revit"></option>
+        <option value="ArchiCAD"></option>
+        <option value="Revit"></option>
+        <option value="Revit"></option>
+    </datalist>
+    {% elif document.file_type == 'pdf' %}
+    <datalist id="software_options">
+        <option value="MS Word"></option>
+        <option value="MS Powerpoint"></option>
+        <option value="Google Docs"></option>
+        <option value="Adobe Acrobat"></option>
+    </datalist>
+    {% elif document.file_type == 'csv' %}
+    <datalist id="software_options">
+        <option value="MS Excel"></option>
+        <option value="Google Sheets"></option>
+    </datalist>
+    {% endif %}
+    {% endfor %}
+    {{data_external}}
+    <br><br>
+    <label for="document_creation_software_version">Creation software version:</label>
+    <input size="40" type="text" id="document_creation_software_version" name="document_creation_software_version" required align="left">
+    {{data_external}}
+    <br><br>
+    <label for="preservation_until_date">Date until which document needs to be preserved:</label>
+    <input style="width: 36ch;" type="datetime-local" id="preservation_until_date" name="preservation_until_date" required align="left">
+    {{data_external}}
+    <br><br>
+    <fieldset>
+        <label for="content_type_documentation">Check if document contains documentation information</label>
+        <input type="checkbox" id="content_type_documentation" name="content_type_geometrical" value="content_type_documentation_true" align="left">
+        {{data_external}}
+        <label for="content_type_geometrical">Check if document contains geometrical information</label>
+        <input type="checkbox" id="content_type_geometrical" name="content_type_geometrical" value="content_type_geometrical_true" align="left">
+        {{data_external}}
+        <label for="content_type_alphanumerical">Check if document contains alphanumerical information</label>
+        <input type="checkbox" id="content_type_alphanumerical" name="content_type_alphanumerical" value="content_type_alphanumerical_true" align="left">
+        {{data_external}}
+        <br><br>
+    </fieldset>
+    <label for="document_status">Document status:</label>
+    <select style="width: 36ch;" type="text" id="document_status" name="document_status" required align="left">
+        <option value="" disabled selected>Select document status</option>
+        <option value="" disabled></option>
+        <option value="WIP">Work in Progress</option>
+        <option value="shared">Shared</option>
+        <option value="published">Published</option>
+        <option value="archived">Archived</option>
+    </select>
+    {{data_external}}
+    <br><br>
+    <label for="responsible_actor">Responsible actor:</label>
+    <select style="width: 36ch;" type="text" id="responsible_actor" name="responsible_actor" required align="left">
+        <option value="" disabled selected>Select a responsible actor</option>
+        <option value="" disabled></option>
+        {% for actor in existing_actors %}
+        <option value="{{ actor.id }}">{{ actor.name }}</option>
+        {% endfor %}
+    </select> 
+    <br><br><br>
+    <input formaction="{% url 'app:dd_upload_file_3' %}" type="submit" value="Continue">
+</form>
+</div>
+{% endblock %}

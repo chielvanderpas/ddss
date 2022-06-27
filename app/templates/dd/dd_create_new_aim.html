@@ -1,0 +1,18 @@
+{% extends 'sidebar/template_add_data.html' %}
+{% block content %}
+<p class="text-gray-900 text-base no-underline hover:no-underline font-extrabold text-xl" align="center"><b><u>Create a new AIM to which data will be added</u></b></p>
+<div style="text-align: center;">
+<br>
+{{output}}
+<br><br>
+    <form method="post" id="form">
+      {% csrf_token %}
+      <a>Name of new AIM:</a>
+      <br><br>
+      <input type="text" id="aim_name" name="aim_name" placeholder="AIM name" required align="left">
+      <br><br><br>
+      {{data_external}}
+      <input formaction="{% url 'app:dd_create_new_aim_2' %}" type="submit" value="Continue">
+    </form>
+</div>
+{% endblock %}

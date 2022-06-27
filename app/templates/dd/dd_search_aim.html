@@ -1,0 +1,24 @@
+{% extends 'sidebar/template_add_data.html' %}
+{% block content %}
+<p class="text-gray-900 text-base no-underline hover:no-underline font-extrabold text-xl" align="center"><b><u>Select an AIM to which data will be added</u></b></p>
+<div style="text-align: center;">
+<br>
+{{output}}
+<br><br>
+<form method="post" id="form">
+    {% csrf_token %}
+        <a>Select AIM:</a>
+        <br><br>
+        <select type="text" id="aim_namespace" name="aim_namespace" required>
+            <option value="" disabled selected>Select AIM</option>
+            <option value="" disabled></option>
+            {% for aim in existing_aims %}
+                <option value="{{ aim.namespace }}">{{ aim.name }}</option>
+            {% endfor %}
+        </select>
+        <br><br><br>
+        {{data_external}}
+        <input formaction="{% url 'app:dd_select_existing_aim_2' %}" type="submit" value="Continue">
+</form>
+</div>
+{% endblock %}

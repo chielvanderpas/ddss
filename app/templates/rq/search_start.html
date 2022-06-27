@@ -1,0 +1,62 @@
+{% extends 'sidebar/template_search_data.html' %}
+{% block content %}
+<p class="text-gray-900 text-base no-underline hover:no-underline font-extrabold text-xl" align="center"><b><u>Search data in DDSS</u></b></p>
+<div style="text-align: center;">
+<br>
+<p class="py-6">---</p>
+<br><br>
+<form method="post" id="form">
+    <a>In which AIM do you want to search?</a>
+    <br>
+    <select style="width: 36ch;" type="text" id="selected_aim" name="selected_aim" required align="left">
+        <option value="" disabled selected>Select an AIM</option>
+        <option value="" disabled></option>
+        <option value="all"><b>Search in all AIM's</b></option>
+        <optgroup label="Select an AIM">
+        {% for aim in existing_aims %}
+            <option value="{{ aim.namespace }}">{{ aim.name }}</option>
+        {% endfor %}
+        </optgroup>
+    </select>  
+    <br><br>
+    <a>What are you looking for?</a>
+    <br>
+    <select style="width: 36ch;" type="text" id="search_entry" name="search_entry" onchange="Script1()" required align="left">
+        <option value="Site">Sites</option>
+        <option value="Building">Buildings</option>
+        <option value="Storey">Storeys</option>
+        <option value="Space">Spaces</option>
+        <option value="Element">Elements</option>
+        <option value="Document">Documents</option>
+        <option value="Event">Events</option>
+        <option value="Person">Persons</option>
+    </select>
+    <br><br>
+    <a>Set conditions (optional):</a>
+    <br>
+    <input style="width: 36ch;" type="text" id="condition1_s" name="condition1_s" readonly align="left">
+    &nbsp;
+    <select style="width: 36ch;" type="text" id="condition1_p" name="condition_1p" align="left">
+        <option id="condition_1_option"></option>
+    </select>
+    &nbsp;
+    <input style="width: 36ch;" type="text" id="condition1_o" name="condition1_o" align="left">
+</form>
+</div>
+<script>
+    function Script1() {
+        var value = document.getElementById("search_entry").value;
+        var a = document.getElementById("condition1_s"); // <a id="p"></a>
+        var x = document.getElementById("condition1_p");
+        x.innerHTML = "";
+        a.setAttribute("value", value)
+        if (value == "Document") {
+            var option = document.createElement("option");
+            option.value = "test1a";
+            console.log(option.value);
+            option.text = "test1b";
+            x.add(option);
+        }
+    }
+</script>
+{% endblock %}

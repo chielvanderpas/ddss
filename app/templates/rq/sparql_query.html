@@ -1,0 +1,19 @@
+{% extends 'sidebar/template_custom_sparql_query.html' %}
+{% block content %}
+<p class="py-6"><b><i>Query:</i></b></p>
+    <form action="{% url 'app:sparql_query_2' %}" method="post">
+      {% csrf_token %}
+      SELECT <input type="text" name="select" required><br><br>
+      {{data_external}}
+      WHERE { <input type="text" name="where" required> . }<br><br>
+      {{data_external}}
+      <br>
+      Example query:
+      SELECT <i>?Building</i>
+      WHERE { <i>?Building rdf:type bot:Building</i> . }
+      <br>
+      {{output}}
+      <br><br>
+      <input type="submit" value="Run query">
+    </form>
+{% endblock %}

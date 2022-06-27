@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -37,7 +38,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rdflib_django',
+    'rest_framework',
+    'app',
+    'frontend.apps.FrontendConfig',
 ]
 
 MIDDLEWARE = [
@@ -55,7 +58,7 @@ ROOT_URLCONF = 'ddss.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['test_app/templates'],
+        'DIRS': ['app/templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -118,7 +121,20 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+LOGIN_URL = '/app/login'
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+MEDIA_URL = '/document/'
+
+SPARQL_ENDPOINT_1 = 'http://localhost:7200/repositories/test_repo'
+SPARQL_ENDPOINT_2 = 'http://localhost:7200/repositories/test_repo/statements'
+AIM_DEFAULT_NAMESPACE = 'https://github.com/chielvanderpas/aims/'
+MEDIA_ROOT = 'C:/Users/chiel/Desktop/django_ddss/documents'

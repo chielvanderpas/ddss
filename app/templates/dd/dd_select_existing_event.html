@@ -1,0 +1,24 @@
+{% extends 'sidebar/template_add_data.html' %}
+{% block content %}
+<p class="text-gray-900 text-base no-underline hover:no-underline font-extrabold text-xl" align="center"><b><u>Select an existing event</u></b></p>
+<div style="text-align: center;">
+<br>
+{{output}}
+<br><br>
+    <form method="post" id="form">
+      {% csrf_token %}
+      <a>Select event:</a>
+      <br><br>
+      <select type="text" id="event" name="event" align="left">
+         <option value="" disabled selected>Select event</option>
+         <option value="" disabled></option>
+         {% for event in existing_events %} 
+         <option value="{{ event.id }}">{{ event.list_text }}</option>
+         {% endfor %}
+      </select>
+      <br><br><br>
+      {{data_external}}
+      <input formaction="{% url 'app:dd_select_existing_event_2' %}" type="submit" value="Continue">
+    </form>
+  </div>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends 'sidebar/template_add_data.html' %}
+{% block content %}
+<p class="text-gray-900 text-base no-underline hover:no-underline font-extrabold text-xl" align="center"><b><u>Select event</u></b></p>
+<div style="text-align: center;">
+<br>
+<p class="py-6">A data drop has been created with unique ID <i>{{output}}</i>. Would you like to relate this data drop to an existing event or would you like to create a new event?</p>
+<br>
+<form>
+    <input formaction="{% url 'app:dd_create_new_event_1' %}" type="submit" value="Create new event"/>
+    <input {{disabled}} formaction="{% url 'app:dd_select_existing_event_1' %}" type="submit" value="Select existing event"/>
+    <input formaction="{% url 'app:dd_upload_file_1' %}" type="{{visibility_status}}" value="Continue with earlier selected event"/>
+</form>
+</div>
+{% endblock %}

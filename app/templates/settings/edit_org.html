@@ -1,0 +1,21 @@
+{% extends 'sidebar/template_none.html' %}
+{% block content %}
+<form action="{% url 'app:org_edit' %}" method="post">
+   {% csrf_token %}
+      <select type="text" id="user" name="user" required align="left">
+         <option value="" disabled selected>Select a user</option>
+         <option value="" disabled></option>
+         {% for user in existing_users %} 
+         <option value="{{ user.id }}, {{user.name}}, {{user.email}}">{{ user.name }}</option>
+         {% endfor %}
+      </select>   
+   {{data_external}}
+   <br>
+   <br>
+   <input type="submit" value="Edit user"/>
+</form>
+<br>
+<form action="{% url 'app:org_add' %}">
+   <input type="submit" value="Add new user"/>
+</form>
+{% endblock %}
