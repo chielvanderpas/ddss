@@ -1,0 +1,18 @@
+{% extends 'sidebar/template_navigate_aims.html' %}
+{% block content %}
+<p class="text-gray-900 text-base no-underline hover:no-underline font-extrabold text-xl" align="center"><b><u>AIM's in DDSS</u></b></p>
+<div style="text-align: left;">
+<br><br>
+{% for aim in existing_aims %}
+<blockquote class="border-l-4 border-red-500 my-8 pl-8 md:pl-12">
+    <form action="{% url 'app:instance_aim_content' %}" method="post" style="display:inline;">
+        {% csrf_token %}
+        <input type="hidden" id="aim_name" name="aim_name" value="{{aim.name}}">
+        <input type="hidden" id="aim_namespace" name="aim_namespace" value="{{aim.namespace}}">
+        <button type="submit" class="btn-link text-red-500 no-underline hover:underline">{{aim.name}}</button>
+        {{data_external}}
+    </form>
+</blockquote>
+{% endfor %}
+</div>
+{% endblock %}

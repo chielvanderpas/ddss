@@ -200,30 +200,162 @@ def rq_settings1(email):
 
 ### data request models: create custom sparql query ###
 
-def rq_sparql_query(query_select, query_where):
+def rq_sparql_query(query):
+    o_xxx = 'bladiebla'
+    input = sparqlstore.SPARQLUpdateStore()
+    input.open((sparql_endpoint_1))
+    q = """
+    """+query+"""
+    """
+    result = input.query(q)
+    output = []
+    for row in result:
+        triple = str(f"{row}")
+        triple_rev = triple.replace('rdflib.term.URIRef(', '').replace('rdflib.term.Literal(', '').replace('(', '').replace(')', '')
+        output.append(triple_rev)
+    return output
+
+### data request models: aims ###
+
+def rq_aim_bot(aim_namespace):
+    nss_aim = str('aim: <'+aim_namespace+'>')
+    aim_rev = str(f"<{aim_namespace}>")
     input = sparqlstore.SPARQLUpdateStore()
     input.open((sparql_endpoint_1))
     q = """
     PREFIX """+nss_bot+"""
     PREFIX """+nss_ddss+"""
     PREFIX """+nss_rdf+"""
-    PREFIX """+nss_oms+""""
+    PREFIX """+nss_oms+"""
     PREFIX """+nss_aim+"""
-    SELECT """+query_select+"""
+    SELECT ?aim ?aim_name ?bot ?bot_type ?bot_name
     WHERE {
-        """+query_where+""" .
+        ?aim rdf:type ddss:AIM .
+        VALUES ?aim {
+            """+aim_rev+"""
+        }
+        ?aim ddss:hasModelName ?aim_name .
+        ?bot rdf:type ?bot_type .
+        VALUES ?bot_type {
+            bot:Site
+            bot:Building
+            bot:Storey
+            bot:Space
+            bot:Element
+        }
+        ?bot ddss:partOf ?aim .
+        ?bot ddss:hasName ?bot_name .
     }
     """
     result = input.query(q)
+    namedlist = collections.namedtuple('namedlist', ['aim', 'aim_name', 'bot', 'bot_type', 'bot_name'])
     output = []
     for row in result:
-        triple = str(f"{row}")  # Used to be row.building
-        output.append(triple)
+        aim = row.aim.replace('', '')
+        aim_name = row.aim_name.replace('', '')
+        bot = row.bot.replace(aim_namespace, '')
+        bot_type = row.bot_type.replace(o_bot, '')
+        bot_name = row.bot_name.replace(aim_namespace, '')
+        output.append(namedlist(aim, aim_name, bot, bot_type, bot_name))
     return output
 
-### data request models: custom models ###
+def rq_aim_documents(aim_namespace):
+    nss_aim = str('aim: <'+aim_namespace+'>')
+    aim_rev = str(f"<{aim_namespace}>")
+    input = sparqlstore.SPARQLUpdateStore()
+    input.open((sparql_endpoint_1))
+    q = """
+    PREFIX """+nss_bot+"""
+    PREFIX """+nss_ddss+"""
+    PREFIX """+nss_rdf+"""
+    PREFIX """+nss_oms+"""
+    PREFIX """+nss_aim+"""
+    SELECT ?aim ?aim_name ?document ?doc_type ?doc_name
+    WHERE {
+        ?aim rdf:type ddss:AIM .
+        VALUES ?aim {
+            """+aim_rev+"""
+        }
+        ?aim ddss:hasModelName ?aim_name .
+        ?document rdf:type ?doc_type .
+        VALUES ?doc_type {
+            ddss:IFC
+            ddss:PDF
+            ddss:CSV
+            ddss:PNG
+            ddss:JPEG
+            ddss:PCD
+            ddss:TXT
+            ddss:IFC2x3
+            ddss:IFC4
+        }
+        ?document ddss:partOf ?aim .
+        ?document ddss:hasFileName ?doc_name .
+    }
+    """
+    result = input.query(q)
+    namedlist = collections.namedtuple('namedlist', ['aim', 'aim_name', 'document', 'doc_type', 'doc_name'])
+    output = []
+    for row in result:
+        aim = row.aim.replace('', '')
+        aim_name = row.aim_name.replace('', '')
+        document = row.document.replace(aim_namespace, '')
+        doc_type = row.doc_type.replace(o_ddss, '')
+        doc_name = row.doc_name.replace('', '')
+        output.append(namedlist(aim, aim_name, document, doc_type, doc_name))
+    return output
 
-def rq_events1(instance):
+def rq_aim_events(aim_namespace):
+    nss_aim = str('aim: <'+aim_namespace+'>')
+    aim_rev = str(f"<{aim_namespace}>")
+    input = sparqlstore.SPARQLUpdateStore()
+    input.open((sparql_endpoint_1))
+    q = """
+    PREFIX """+nss_bot+"""
+    PREFIX """+nss_ddss+"""
+    PREFIX """+nss_rdf+"""
+    PREFIX """+nss_oms+"""
+    PREFIX """+nss_aim+"""
+    SELECT ?aim ?aim_name ?event ?event_type ?event_startdatetime ?event_description
+    WHERE {
+        ?aim rdf:type ddss:AIM .
+        VALUES ?aim {
+            """+aim_rev+"""
+        }
+        ?aim ddss:hasModelName ?aim_name .
+        ?event rdf:type ?event_type .
+        VALUES ?event_type {
+            ddss:Maintenance
+            ddss:Survey
+            ddss:Operations
+            ddss:Inspections
+            ddss:Renewal
+            ddss:Refurbish
+            ddss:EndOfLife
+            ddss:Acquire
+        } 
+        ?event ddss:partOf ?aim .
+        ?event ddss:startedAt ?event_startdatetime .
+        ?event ddss:hasDescription ?event_description .
+    }
+    """
+    result = input.query(q)
+    namedlist = collections.namedtuple('namedlist', ['aim', 'aim_name', 'event', 'event_type', 'event_startdatetime', 'event_description'])
+    output = []
+    for row in result:
+        aim = row.aim.replace('', '')
+        aim_name = row.aim_name.replace('', '')
+        event = row.event.replace(aim_namespace, '')
+        event_type = row.event_type.replace(o_ddss, '')
+        event_startdatetime = row.event_startdatetime.replace('', '')
+        event_description = row.event_description.replace('', '')
+        output.append(namedlist(aim, aim_name, event, event_type, event_startdatetime, event_description))
+    return output
+
+### data request models: instance models ###
+
+def rq_event1(aim_namespace, instance): 
+    nss_aim = str('aim: <'+aim_namespace+'>')
     input = sparqlstore.SPARQLUpdateStore()
     input.open((sparql_endpoint_1))
     q = """
@@ -262,26 +394,22 @@ def rq_events1(instance):
     namedlist = collections.namedtuple('namedlist', ['id', 'type', 'startdatetime', 'enddatetime', 'description', 'subevent', 'actor', 'actor_name'])
     output = []
     for row in result:
-        id = row.event
-        id_rev = id.replace(o_aim, '')
-        type = row.type
-        type_rev = type.replace(o_ddss, '')
+        id = row.event.replace(aim_namespace, '')
+        type = row.type.replace(o_ddss, '')
         startdatetime = row.startdatetime
         enddatetime = row.enddatetime
         description = row.description
         if row.subevent is not None:
-            subevent = row.subevent
-            subevent_rev = subevent.replace(o_aim, '')
+            subevent = row.subevent.replace(aim_namespace, '')
         else:
             subevent = str('')
-            subevent_rev = subevent
-        actor = row.actor
-        actor_rev = actor.replace(o_oms, '')
+        actor = row.actor.replace(o_oms, '')
         actor_name = row.actor_name
-        output.append(namedlist(id_rev, type_rev, startdatetime, enddatetime, description, subevent_rev, actor_rev, actor_name))
+        output.append(namedlist(id, type, startdatetime, enddatetime, description, subevent, actor, actor_name))
     return output
 
-def rq_actors1(instance):
+def rq_actor1(aim_namespace, instance):
+    nss_aim = str('aim: <'+aim_namespace+'>')
     input = sparqlstore.SPARQLUpdateStore()
     input.open((sparql_endpoint_1))
     q = """
@@ -312,43 +440,6 @@ def rq_actors1(instance):
         phone_number = row.phone_number
         output.append(namedlist(id_rev, name, email, phone_number))
     return output
-
-def rq_model5(type):
-    input = sparqlstore.SPARQLUpdateStore()
-    input.open((sparql_endpoint_1))
-    q = """
-    PREFIX """+nss_bot+"""
-    PREFIX """+nss_ddss+"""
-    PREFIX """+nss_rdf+"""
-    PREFIX """+nss_org+"""
-    PREFIX """+nss_foaf+"""
-    PREFIX """+nss_oms+"""
-    PREFIX """+nss_aim+"""
-    SELECT ?subject
-    WHERE {
-        ?subject rdf:type """+type+"""
-    }
-    """
-    result = input.query(q)
-    output = []
-    for row in result:
-        subject = row.subject
-        if o_ddss in subject:
-            subject_rev = subject.replace(o_ddss, '')
-        elif o_rdf in subject:
-            subject_rev = subject.replace(o_rdf, '')
-        elif o_bot in subject:
-            subject_rev = subject.replace(o_bot, '')
-        elif o_org in subject:
-            subject_rev = subject.replace(o_org, '')
-        elif o_foaf in subject:
-            subject_rev = subject.replace(o_foaf, '')
-        else:
-            subject_rev = subject
-        output.append(subject_rev)
-    return output
-
-### To do: unrestricted (select) queries ###
 
 ########################
 ### Data drop models ###
@@ -456,7 +547,7 @@ def dd_create(o_aim, user_id):
 
 ### Data drop: add event ###
 
-def rq_event1(o_aim):
+def rq_event2(o_aim):
     nss_aim = str('aim: <'+o_aim+'>')
     input = sparqlstore.SPARQLUpdateStore()
     input.open((sparql_endpoint_1))
@@ -494,7 +585,7 @@ def rq_event1(o_aim):
         output.append(namedlist(id_rev, list_text_rev))
     return output
 
-def rq_event2(o_aim):
+def rq_event3(o_aim):
     nss_aim = str('aim: <'+o_aim+'>')
     input = sparqlstore.SPARQLUpdateStore()
     input.open((sparql_endpoint_1))
@@ -527,52 +618,51 @@ def rq_event2(o_aim):
 def dd_event1(o_aim, event_type, event_description, startdatetime, enddatetime, related_actor, super_event, unique_dd_id):
     ns_aim = Namespace(o_aim)
     unique_event_id = BNode()
+    s = URIRef(ns_aim+unique_event_id)
     predicate1 = 'type'
-    s1 = URIRef(ns_aim+unique_event_id)
     p1 = URIRef(ns_rdf+predicate1)
     o1 = URIRef(ns_ddss+event_type)
     predicate2 = 'hasDescription'
-    s2 = URIRef(ns_aim+unique_event_id)
     p2 = URIRef(ns_ddss+predicate2)
     o2 = Literal(event_description)
     predicate3 = 'startedAt'
-    s3 = URIRef(ns_aim+unique_event_id)
     p3 = URIRef(ns_ddss+predicate3)
     o3 = Literal(startdatetime)
     predicate4 = 'endedAt'
-    s4 = URIRef(ns_aim+unique_event_id)
     p4 = URIRef(ns_ddss+predicate4)
     o4 = Literal(enddatetime)
     predicate5 = 'involves'
-    s5 = URIRef(ns_aim+unique_event_id)
     p5 = URIRef(ns_ddss+predicate5)
     o5 = URIRef(ns_oms+related_actor)
     if super_event != None:
         predicate6 = 'hasSubEvent'
         s6 = URIRef(ns_aim+super_event)
         p6 = URIRef(ns_ddss+predicate6)
-        o6 = URIRef(ns_aim+unique_event_id)
+        o6 = s
     predicate7 = 'relatesToEvent'
     s7 = URIRef(ns_aim+unique_dd_id)
     p7 = URIRef(ns_ddss+predicate7)
-    o7 = URIRef(ns_aim+unique_event_id)
+    o7 = s
+    predicate8 = 'partOf'
+    p8 = URIRef(ns_ddss+predicate8)
+    o8 = URIRef(o_aim)
     input = sparqlstore.SPARQLUpdateStore()
     input.open((sparql_endpoint_1, sparql_endpoint_2))
     input.add((
-        s1, p1, o1,
+        s, p1, o1,
     ))
     input.add((
-        s2, p2, o2,
+        s, p2, o2,
     ))
     input.add((
-        s3, p3, o3,
+        s, p3, o3,
     ))
     if enddatetime != "":
         input.add((
-            s4, p4, o4,
+            s, p4, o4,
         ))
     input.add((
-        s5, p5, o5,
+        s, p5, o5,
     ))
     if super_event != None:
         input.add((
@@ -583,6 +673,9 @@ def dd_event1(o_aim, event_type, event_description, startdatetime, enddatetime, 
     ))
     input.add((
         o7, p7, s7,
+    ))
+    input.add((
+        s, p8, o8,
     ))
     return 'Success, added {} as an event with unique ID {}.'.format(event_type, unique_event_id)
 
@@ -689,6 +782,9 @@ def dd_document1(o_aim, file_name, file_type, file_location, copy_name, copy_typ
     predicate3 = 'locatedAt'
     p3 = URIRef(ns_ddss+predicate3)
     o3 = Literal(file_location)
+    predicate4 = 'partOf'
+    p4 = URIRef(ns_ddss+predicate4)
+    o4 = URIRef(o_aim)
     input = sparqlstore.SPARQLUpdateStore()
     input.open((sparql_endpoint_1, sparql_endpoint_2))
     input.add((
@@ -700,37 +796,40 @@ def dd_document1(o_aim, file_name, file_type, file_location, copy_name, copy_typ
     input.add((
         s, p3, o3,
     ))
+    input.add((
+        s, p4, o4,
+    ))
     namedlist = collections.namedtuple('namedlist', ['id', 'file_type', 'file_name', 'storage_location', 'copy_id', 'copy_file_type', 'copy_file_name', 'copy_storage_location', 'prev_version_id', 'prev_version_status'])
     output = []
     empty_field = ''
     if copy_name != '':
         unique_copy_id = BNode()
-        predicate4 = 'hasCopy'
-        p4 = URIRef(ns_ddss+predicate4)
-        o4 = URIRef(ns_aim+unique_copy_id)
-        predicate5 = 'hasFileFormat'
-        s5 = URIRef(ns_aim+unique_copy_id)
+        predicate5 = 'hasCopy'
         p5 = URIRef(ns_ddss+predicate5)
-        o5 = Literal(copy_type)
-        predicate6 = 'hasFileName'
+        o5 = URIRef(ns_aim+unique_copy_id)
+        predicate6 = 'hasFileFormat'
         s6 = URIRef(ns_aim+unique_copy_id)
         p6 = URIRef(ns_ddss+predicate6)
-        o6 = Literal(copy_name)
-        predicate7 = 'locatedAt'
+        o6 = Literal(copy_type)
+        predicate7 = 'hasFileName'
         s7 = URIRef(ns_aim+unique_copy_id)
         p7 = URIRef(ns_ddss+predicate7)
-        o7 = Literal(copy_location)
+        o7 = Literal(copy_name)
+        predicate8 = 'locatedAt'
+        s8 = URIRef(ns_aim+unique_copy_id)
+        p8 = URIRef(ns_ddss+predicate8)
+        o8 = Literal(copy_location)
         input.add((
-            s, p4, o4,
-        ))
-        input.add((
-            s5, p5, o5,
+            s, p5, o5,
         ))
         input.add((
             s6, p6, o6,
         ))
         input.add((
             s7, p7, o7,
+        ))
+        input.add((
+            s8, p8, o8,
         ))
     if prev_version != None:
         for document in prev_version:
@@ -740,11 +839,11 @@ def dd_document1(o_aim, file_name, file_type, file_location, copy_name, copy_typ
         prev_version_id = ''
         prev_version_status = ''
     if prev_version_id != '':
-        predicate8 = 'hasPreviousVersion'
-        p8 = URIRef(ns_ddss+predicate8)
-        o8 = URIRef(ns_aim+prev_version_id)
+        predicate9 = 'hasPreviousVersion'
+        p9 = URIRef(ns_ddss+predicate9)
+        o9 = URIRef(ns_aim+prev_version_id)
         input.add((
-            s, p8, o8,
+            s, p9, o9,
         ))
     if copy_name == None and prev_version_id == '':
         output.append(namedlist(unique_document_id, file_type, file_name, file_location, empty_field, empty_field, empty_field, empty_field, empty_field, empty_field))
@@ -869,7 +968,7 @@ def dd_document2(o_aim, unique_dd_id, unique_document_id, document_description, 
         s13, p13, o13,
     ))
         
-def dd_ifc1(o_aim, document_storage_location):
+def rq_ifc1(o_aim, document_storage_location):
     model = ifcopenshell.open(document_storage_location)
     namedlist = collections.namedtuple('namedlist', ['type', 'guid', 'name', 'longname', 'description'])
     model_data = []
@@ -987,7 +1086,7 @@ def dd_ifc1(o_aim, document_storage_location):
     intersections = set(model_data).intersection(set(existing_data))
     return model_data, existing_data, intersections
 
-def dd_ifc2(o_aim, related_original, related_new):
+def dd_ifc1(o_aim, related_original, related_new):
     ns_aim = Namespace(o_aim)
     nss_aim = str('aim: <'+o_aim+'>') 
     input = sparqlstore.SPARQLUpdateStore()
@@ -1033,7 +1132,7 @@ def dd_ifc2(o_aim, related_original, related_new):
                 s1, p1, o1,
             ))
 
-def dd_ifc3(o_aim, unique_document_id, model_data, intersections):
+def dd_ifc2(o_aim, unique_document_id, model_data, intersections):
     ns_aim = Namespace(o_aim)
     input = sparqlstore.SPARQLUpdateStore()
     input.open((sparql_endpoint_1, sparql_endpoint_2))
@@ -1046,7 +1145,7 @@ def dd_ifc3(o_aim, unique_document_id, model_data, intersections):
             longname = instance.longname
             description = instance.description
             s = URIRef(ns_aim+uri)
-            predicate1 = 'Type'
+            predicate1 = 'type'
             p1 = URIRef(ns_rdf+predicate1)
             o1 = URIRef(ns_bot+type)
             predicate2 = 'hasGuid'
@@ -1065,6 +1164,9 @@ def dd_ifc3(o_aim, unique_document_id, model_data, intersections):
             s6 = URIRef(ns_aim+unique_document_id)
             p6 = URIRef(ns_ddss+predicate6)
             o6 = s
+            predicate7 = 'partOf'
+            p7 = URIRef(ns_ddss+predicate7)
+            o7 = URIRef(o_aim)
             input.add((
                 s, p1, o1,
             ))
@@ -1082,6 +1184,9 @@ def dd_ifc3(o_aim, unique_document_id, model_data, intersections):
             ))
             input.add((
                 s6, p6, o6,
+            ))
+            input.add((
+                s, p7, o7,
             ))
 
 
@@ -1106,6 +1211,110 @@ def dd_ifc3(o_aim, unique_document_id, model_data, intersections):
 ### test environment ###
 ########################
 
+# def rq_model5(type):
+#     input = sparqlstore.SPARQLUpdateStore()
+#     input.open((sparql_endpoint_1))
+#     q = """
+#     PREFIX """+nss_bot+"""
+#     PREFIX """+nss_ddss+"""
+#     PREFIX """+nss_rdf+"""
+#     PREFIX """+nss_org+"""
+#     PREFIX """+nss_foaf+"""
+#     PREFIX """+nss_oms+"""
+#     PREFIX """+nss_aim+"""
+#     SELECT ?subject
+#     WHERE {
+#         ?subject rdf:type """+type+"""
+#     }
+#     """
+#     result = input.query(q)
+#     output = []
+#     for row in result:
+#         subject = row.subject
+#         if o_ddss in subject:
+#             subject_rev = subject.replace(o_ddss, '')
+#         elif o_rdf in subject:
+#             subject_rev = subject.replace(o_rdf, '')
+#         elif o_bot in subject:
+#             subject_rev = subject.replace(o_bot, '')
+#         elif o_org in subject:
+#             subject_rev = subject.replace(o_org, '')
+#         elif o_foaf in subject:
+#             subject_rev = subject.replace(o_foaf, '')
+#         else:
+#             subject_rev = subject
+#         output.append(subject_rev)
+#     return output
+
+# def rq_aim_content(aim):
+#     nss_aim = str('aim: <'+aim+'>')
+#     aim_rev = str(f"<{aim}>")
+#     input = sparqlstore.SPARQLUpdateStore()
+#     input.open((sparql_endpoint_1))
+#     q = """
+#     PREFIX """+nss_bot+"""
+#     PREFIX """+nss_ddss+"""
+#     PREFIX """+nss_rdf+"""
+#     PREFIX """+nss_oms+"""
+#     PREFIX """+nss_aim+"""
+#     SELECT ?aim ?name ?site ?building ?storey ?space ?event ?document
+#     WHERE {
+#         ?aim rdf:type ddss:AIM .
+#         VALUES ?aim {
+#             """+aim_rev+"""
+#         }
+#         ?aim ddss:hasModelName ?name .
+#     	OPTIONAL {
+#             ?site rdf:type bot:Site .
+#             ?site ddss:partOf ?aim .
+#         }
+#         OPTIONAL {
+#             ?building rdf:type bot:Building .
+#             ?building ddss:partOf ?aim .
+#         }
+#         OPTIONAL {
+#             ?storey rdf:type bot:Storey .
+#             ?storey ddss:partOf ?aim .
+#         }
+#         OPTIONAL {
+#             ?space rdf:type bot:Space .
+#             ?space ddss:partOf ?aim .
+#         }
+#         OPTIONAL {
+#             ?event rdf:type ddss:Event .
+#             ?event ddss:partOf ?aim .
+#         }
+#         OPTIONAL {
+#             ?document rdf:type ?doc_type .
+#             VALUES ?doc_type {
+#                 ddss:IFC
+#                 ddss:PDF
+#                 ddss:CSV
+#                 ddss:PNG
+#                 ddss:JPEG
+#                 ddss:PCD
+#                 ddss:TXT
+#                 ddss:IFC2x3
+#                 ddss:IFC4
+#             }
+#             ?document ddss:partOf ?aim .
+#         }
+#     }
+#     """
+#     result = input.query(q)
+#     namedlist = collections.namedtuple('namedlist', ['aim', 'name', 'site', 'building', 'storey', 'space', 'event', 'document'])
+#     output = []
+#     for row in result:
+#         aim = row.aim
+#         name = row.name
+#         site = row.site
+#         building = row.building
+#         storey = row.storey
+#         space = row.space
+#         event = row.event
+#         document = row.document
+#         output.append(namedlist(aim, name, site, building, storey, space, event, document))
+#     return output
 
 # def rq_model2(query_construct, query_where):
 #     input = SPARQLWrapper(sparql_endpoint_1)

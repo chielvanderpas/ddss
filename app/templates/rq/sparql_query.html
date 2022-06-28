@@ -1,19 +1,44 @@
 {% extends 'sidebar/template_custom_sparql_query.html' %}
 {% block content %}
-<p class="py-6"><b><i>Query:</i></b></p>
-    <form action="{% url 'app:sparql_query_2' %}" method="post">
-      {% csrf_token %}
-      SELECT <input type="text" name="select" required><br><br>
-      {{data_external}}
-      WHERE { <input type="text" name="where" required> . }<br><br>
-      {{data_external}}
-      <br>
-      Example query:
-      SELECT <i>?Building</i>
-      WHERE { <i>?Building rdf:type bot:Building</i> . }
-      <br>
-      {{output}}
-      <br><br>
-      <input type="submit" value="Run query">
-    </form>
+<p class="text-gray-900 text-base no-underline hover:no-underline font-extrabold text-xl" align="center"><b><u>Custom SPARQL query</u></b></p>
+<div style="text-align: center;">
+<br><br>
+<form method="post">
+    {% csrf_token %}
+    <button style="background-color: #b20000;" formaction="app:sparql_query_1"  type="submit" id="content" name="content"><i>SELECT Query</i></button>
+    <button formaction="app:sparql_query_1" type="submit" id="dd" name="dd"><i>CONSTRUCT Query</i></button>
+    <button formaction="app:sparql_query_1" type="submit" id="dd" name="dd"><i>DESCRIBE Query</i></button>
+    <button formaction="app:sparql_query_1" type="submit" id="dd" name="dd"><i>ASK Query</i></button>
+    {{data_external}}
+</form>
+<br><br>
+<form method="post">
+  {% csrf_token %}
+  {% if new_query == True %}
+  <textarea type="text" id="query" name="query" rows="20" cols="100" autofocus required>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX aim: <https://github.com/chielvanderpas/aims/N891d3520c51c43768fdefedb1d672e59#>
+PREFIX ddss: <https://github.com/chielvanderpas/ddss#>
+PREFIX bot: <https://w3id.org/bot#>
+PREFIX {{nss_oms}}
+SELECT *
+WHERE {
+?s ?p ?o .
+}
+  </textarea>
+  {% else %}
+  <textarea type="text" id="query" name="query" rows="20" cols="100" autofocus required>
+{{query}}
+  </textarea>
+  {% endif %}
+  <br><br>
+  {{data_external}}
+  <input formaction="{% url 'app:sparql_query_2' %}" type="submit" value="Run query">
+</form>
+<br><br>
+{% for row in output %}
+{{ row }}
+<br><br>
+{% endfor %}
+</div>
 {% endblock %}

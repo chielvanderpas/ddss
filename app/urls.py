@@ -26,10 +26,15 @@ urlpatterns = [
     path('org/edit/', views.edit_org_edit, name='org_edit'),
     ############################
     ### data request models ####
+    path('search/content/', views.content, name='content'),
+    path('instance/aim/content/', views.instance_aim_content, name='instance_aim_content'),
+    path('instance/aim/dd/', views.instance_aim_dd, name='instance_aim_dd'),
+    path('instance/event/', views.instance_event, name='instance_event'),
+    path('instance/document/', views.instance_document, name='instance_document'),
+    path('instance/actor/', views.instance_actor, name='instance_actor'),
+    path('instance/building/', views.instance_bot, name='instance_bot'),
     path('search/start/', views.search_start, name='search_start'),
     # path('search/results/', views.search_results, name='search_results'),
-    # path('search/instance/event/', views.instance_event, name='instance_event'),
-    # path('search/instance/actor/', views.instance_actor, name='instance_actor'),
     path('search/sparql_query/1/', views.sparql_query_1, name='sparql_query_1'),  
     path('search/sparql_query/2/', views.sparql_query_2, name='sparql_query_2'),  
     ############################

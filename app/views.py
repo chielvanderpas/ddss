@@ -84,13 +84,13 @@ def settings(request):
 @login_required
 def edit_org(request):
     first_name = request.user.get_short_name()
-    existing_users = models.rq_event2()
+    existing_users = models.rq_event3()
     return render(request, 'settings/edit_org.html', {'first_name':first_name, 'existing_users':existing_users})
 
 @login_required
 def edit_org_add(request):
     first_name = request.user.get_short_name()
-    existing_users = models.rq_event2()
+    existing_users = models.rq_event3()
     return render(request, 'settings/edit_org.html', {'first_name':first_name, 'existing_users':existing_users})
 
 @login_required
@@ -115,45 +115,87 @@ def index(request):
 ##########################
 
 @login_required
+def content(request):
+    first_name = request.user.get_short_name()
+    existing_aims = models.rq_aim()
+    return render(request, 'rq/content.html', {'first_name':first_name, 'existing_aims':existing_aims})
+
+### Data request views: instances ###
+
+@login_required
+def instance_aim_content(request):
+    first_name = request.user.get_short_name()
+    aim_namespace = request.POST.get('aim_namespace')
+    request.session['aim_namespace'] = aim_namespace
+    aim_name = request.POST.get('aim_name')
+    bot = models.rq_aim_bot(aim_namespace)
+    documents = models.rq_aim_documents(aim_namespace)
+    events = models.rq_aim_events(aim_namespace)
+    return render(request, 'rq/instance/aim_content.html', {'first_name':first_name, 'aim_name':aim_name, 'aim_namespace':aim_namespace, 'bot':bot, 'documents':documents, 'events':events})
+
+@login_required
+def instance_aim_dd(request):
+    first_name = request.user.get_short_name()
+    aim = request.POST.get('aim')
+    return render(request, 'rq/instance/aim_content.html', {'first_name':first_name, 'aim':aim, 'content':content})
+
+@login_required
+def instance_event(request):
+    first_name = request.user.get_short_name()
+    aim_namespace = request.session.get('aim_namespace')
+    instance = request.POST.get('event')
+    output = models.rq_event1(aim_namespace, instance)
+    return render(request, 'rq/instance/event.html', {'first_name':first_name, 'output':output})
+
+@login_required
+def instance_document(request):
+    first_name = request.user.get_short_name()
+    aim_namespace = request.session.get('aim_namespace')
+    instance = request.POST.get('document')
+    output = models.rq_actor1(aim_namespace, instance)
+    return render(request, 'rq/instance/document.html', {'first_name':first_name, 'output':output})
+
+@login_required
+def instance_actor(request):
+    first_name = request.user.get_short_name()
+    aim_namespace = request.session.get('aim_namespace')
+    instance = request.POST.get('actor')
+    output = models.rq_actor1(aim_namespace, instance)
+    return render(request, 'rq/instance/actor.html', {'first_name':first_name, 'output':output})
+
+@login_required
+def instance_bot(request):
+    first_name = request.user.get_short_name()
+    aim_namespace = request.session.get('aim_namespace')
+    instance = request.POST.get('instance')
+    # output = models.rq_actor1(aim_namespace, instance)
+    return render(request, 'rq/instance/aim_content.html', {'first_name':first_name})
+
+### Data request views: search ###
+
+@login_required
 def search_start(request):
     first_name = request.user.get_short_name()
     existing_aims = models.rq_aim()
     return render(request, 'rq/search_start.html', {'first_name':first_name, 'existing_aims':existing_aims})
 
+### Data request views: custom sparql query ###
+
 @login_required
 def sparql_query_1(request):
     first_name = request.user.get_short_name()
-    return render(request, 'rq/sparql_query.html', {'first_name':first_name})
+    new_query = True
+    nss_oms = models.nss_oms
+    return render(request, 'rq/sparql_query.html', {'first_name':first_name, 'new_query':new_query, 'nss_oms':nss_oms})
 
 @login_required
 def sparql_query_2(request):
     first_name = request.user.get_short_name()
-    query_select = request.POST.get('select')
-    query_where = request.POST.get('where')
-    output = models.rq_sparql_query(query_select, query_where)
-    return render(request, 'rq/sparql_query.html', {'first_name':first_name, 'output':output})
-
-
-# @login_required
-# def search_results(request):
-#     first_name = request.user.get_short_name()
-#     type = 'ddss:Maintenance'
-#     output = models.rq_model5(type)
-#     return render(request, 'rq/instance.html', {'first_name':first_name, 'output':output})
-
-# @login_required
-# def instance_event(request):
-#     first_name = request.user.get_short_name()
-#     instance = str('N23b6107e76834f8ba718911db1e1ade8')
-#     output = models.rq_events1(instance)
-#     return render(request, 'rq/instance_event.html', {'first_name':first_name, 'output':output})
-
-# @login_required
-# def instance_actor(request):
-#     first_name = request.user.get_short_name()
-#     instance = request.POST.get('actor')
-#     output = models.rq_actors1(instance)
-#     return render(request, 'rq/instance_actor.html', {'first_name':first_name, 'output':output})
+    new_query = False
+    nss_oms = models.nss_oms
+    query = request.POST.get('query')
+    output = models.rq_sparql_query(query)
+    return render(request, 'rq/sparql_query.html', {'first_name':first_name, 'new_query':new_query, 'nss_oms':nss_oms, 'query':query, 'output':output,})
 
 #######################
 ### Data drop views ###
@@ -186,7 +228,7 @@ def dd_continue(request):
     first_name = request.user.get_short_name()
     request.session['new_dd'] = False
     o_aim = request.session.get('o_aim', None)
-    existing_events_check = models.rq_event1(o_aim)
+    existing_events_check = models.rq_event2(o_aim)
     if existing_events_check == []:
         disabled = 'disabled'
     else:
@@ -213,7 +255,7 @@ def dd_create_new_aim_2(request):
         request.session['current_dd_start_time'] = datetime.now().strftime("%Y-%m-%dT%H:%M")
     else:
         unique_dd_id = request.session.get('unique_dd_id', None)
-    existing_events_check = models.rq_event1(o_aim)
+    existing_events_check = models.rq_event2(o_aim)
     if existing_events_check == []:
         disabled = 'disabled'
     else:
@@ -240,7 +282,7 @@ def dd_select_existing_aim_2(request):
         request.session['current_dd_start_time'] = datetime.now().strftime("%Y-%m-%dT%H:%M")
     else:
         unique_dd_id = request.session.get('unique_dd_id', None)
-    existing_events_check = models.rq_event1(o_aim)
+    existing_events_check = models.rq_event2(o_aim)
     if existing_events_check == []:
         disabled = 'disabled'
     else:
@@ -252,7 +294,7 @@ def dd_select_existing_aim_2(request):
 def dd_select_existing_event_1(request):
     first_name = request.user.get_short_name()
     o_aim = request.session.get('o_aim', None)
-    existing_events = models.rq_event1(o_aim)
+    existing_events = models.rq_event2(o_aim)
     return render(request, 'dd/dd_select_existing_event.html', {'first_name':first_name, 'existing_events':existing_events})
 
 @login_required
@@ -268,16 +310,16 @@ def dd_select_existing_event_2(request):
 def dd_create_new_event_1(request):
     first_name = request.user.get_short_name()
     o_aim = request.session.get('o_aim', None)
-    existing_events = models.rq_event1(o_aim)
-    existing_actors = models.rq_event2(o_aim)
+    existing_events = models.rq_event2(o_aim)
+    existing_actors = models.rq_event3(o_aim)
     return render(request, 'dd/dd_create_new_event.html', {'first_name':first_name, 'existing_events':existing_events, 'existing_actors':existing_actors})
 
 @login_required
 def dd_create_extra_event_1(request):
     first_name = request.user.get_short_name()
     o_aim = request.session.get('o_aim', None)
-    existing_events = models.rq_event1(o_aim)
-    existing_actors =models.rq_event2(o_aim)
+    existing_events = models.rq_event2(o_aim)
+    existing_actors =models.rq_event3(o_aim)
     event_type = request.POST.get('event_type')
     event_description = request.POST.get('event_description')
     startdatetime = request.POST.get('startdatetime')
@@ -343,7 +385,7 @@ def dd_upload_file_2(request):
     else:
         prev_version = None
     message = 'The document has successfully been uploaded. Please enrich the documents metadata in order to make sure it will be stored correctly.'
-    existing_actors = models.rq_event2(o_aim)
+    existing_actors = models.rq_event3(o_aim)
     output = models.dd_document1(o_aim, file_name_rev, file_type, file_location, copy_name, copy_type, copy_location, prev_version)
     return render(request, 'dd/dd_enrich_file.html', {'first_name':first_name, 'message':message, 'output':output, 'existing_actors':existing_actors})
 
@@ -375,7 +417,7 @@ def dd_upload_file_3(request):
     if document_type == 'ifc':
         request.session['unique_document_id'] = unique_document_id
         request.session['document_storage_location'] = document_storage_location
-        model_data, existing_data, intersections = models.dd_ifc1(o_aim, document_storage_location)
+        model_data, existing_data, intersections = models.rq_ifc1(o_aim, document_storage_location)
         type_check = []
         if any(a.type == 'Site' for a in existing_data):
             type_check.append('Site')
@@ -402,8 +444,8 @@ def dd_upload_file_4(request):
     document_storage_location = request.session.get('document_storage_location', None)
     related_original = request.POST.get('related_original')
     related_new = request.POST.get('related_new')
-    models.dd_ifc2(o_aim, related_original, related_new)
-    model_data, existing_data, intersections = models.dd_ifc1(o_aim, document_storage_location)
+    models.dd_ifc1(o_aim, related_original, related_new)
+    model_data, existing_data, intersections = models.rq_ifc1(o_aim, document_storage_location)
     type_check = []
     if any(a.type == 'Site' for a in existing_data):
         type_check.append('Site')
@@ -425,8 +467,8 @@ def dd_upload_file_5(request):
     unique_document_id = request.session.get('unique_document_id', None)
     document_storage_location = request.session.get('document_storage_location', None)
     unique_dd_id = request.session.get('unique_dd_id', None)
-    model_data, existing_data, intersections = models.dd_ifc1(o_aim, document_storage_location)
-    models.dd_ifc3(o_aim, unique_document_id, model_data, intersections)
+    model_data, existing_data, intersections = models.rq_ifc1(o_aim, document_storage_location)
+    models.dd_ifc2(o_aim, unique_document_id, model_data, intersections)
     if unique_dd_id == None:
         disabled = 'disabled'
     else:
@@ -461,6 +503,13 @@ def dd_end(request):
 ########################
 ### test environment ###
 ########################
+
+# @login_required
+# def search_results(request):
+#     first_name = request.user.get_short_name()
+#     type = 'ddss:Maintenance'
+#     output = models.rq_model5(type)
+#     return render(request, 'rq/instance.html', {'first_name':first_name, 'output':output})
 
 # from . import serializers
 # from rest_framework import serializers, viewsets, generics

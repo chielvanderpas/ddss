@@ -1,0 +1,28 @@
+{% extends 'sidebar/template_navigate_aims.html' %}
+{% block content %}
+<p class="py-3">{{welcome_message}}</p>
+{% for event in output %}  
+<blockquote class="border-l-4 border-red-500 my-8 pl-8 md:pl-12">
+     <b>Event</b>
+     <br>
+     Event ID: <i>{{event.id}}</i>
+     <br>
+     Event type: <i>{{event.type}}</i>
+     <br>
+     Start date & time: <i>{{event.startdatetime}}</i>
+     <br>
+     End date & time: <i>{{event.enddatetime}}</i>
+     <br>
+     Description: <i>{{event.description}}</i>
+     <br>
+     Sub events: <i>{{event.subevent}}</i>
+     <br>
+     Involved actor:
+     <form action="{% url 'app:instance_actor' %}" method="post" style="display:inline;">
+         {% csrf_token %}
+         <button type="submit" id="actor" name="actor" value="{{event.actor}}" class="btn-link text-red-500 no-underline hover:underline"><i>{{event.actor_name}}</i></button>
+         {{data_external}}
+     </form>
+</blockquote>
+{% endfor %}
+{% endblock %}
