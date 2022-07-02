@@ -1,0 +1,97 @@
+{% extends 'sidebar/template_add_data.html' %}
+{% block content %}
+<p class="text-gray-900 text-base no-underline hover:no-underline font-extrabold text-xl" align="center"><b><u>Extract building data</u></b></p>
+<br>
+<p class="py-6">Below, you can find all site-, building-, storey-, space-, and element instances in the ifc file.</p>
+<br>
+{% for instance in model_data %}  
+{% if instance.type != 'Element' %}
+<blockquote class="border-l-4 border-red-500 my-8 pl-8 md:pl-12">
+     <b>Instance</b>
+     <br>
+     Type: <i>{{instance.type}}</i>
+     <br>
+     GUID: <i>{{instance.guid}}</i>
+     <br>
+     Name: <i>{{instance.name}}</i>
+     <br>
+     Long name: <i>{{instance.longname}}</i>
+     <br>
+     Description: <i>{{instance.description}}</i>
+     <br>
+     {% if instance in intersections %}
+     <i>This instance already exists in DDSS.</i>
+     {% elif related_new_guid == instance.guid %}
+     <i>This instance already exists in DDSS.</i>
+     {% elif instance.type not in type_check %}
+     {% else %}
+     <form method="post">
+        {% csrf_token %}
+        <a><i>If applicable, select instance that is the same as this instance:</i></a>
+        <input type="hidden" id="related_new" name="related_new" value="{{instance.guid}}">
+        <select style="width: 36ch;" type="text" id="related_original" name="related_original" align="left">
+           <option value="" disabled selected>Select instance</option>
+           <option value="" disabled></option>
+           {% for e_instance in existing_data %}
+           {% if e_instance.type == instance.type %}
+           <option value="{{ e_instance.guid }}">{{ e_instance.name }}</option>
+           {% endif %}
+           {% endfor %}
+           <br>
+           <input formaction="{% url 'app:dd_upload_file_4' %}" type="submit" value="Create link"/>
+        </select>
+     </form>
+     {% endif %}
+     <br>
+</blockquote>
+{% endif %}
+{% endfor %}
+<br><br>
+<div style="text-align: center;">
+<form method="post">
+    {% csrf_token %}
+    <input formaction="{% url 'app:dd_upload_file_5' %}" type="submit" value="Continue"/>
+</form>
+</div>
+<br><br>
+<form>
+    <a><i>Check to show ifc-elements</i></a>
+    <input type="checkbox" id="show_elements" name="show_elements" align="left">
+    </form>
+<div style="visibility:hidden;" id="ifcelement" name="ifcelement">
+{% for instance in model_data %}  
+{% if instance.type == 'Element' %}
+<blockquote class="border-l-4 border-red-500 my-8 pl-8 md:pl-12">
+     <b>Instance</b>
+     <br>
+     Type: <i>{{instance.type}}</i>
+     <br>
+     GUID: <i>{{instance.guid}}</i>
+     <br>
+     Name: <i>{{instance.name}}</i>
+     <br>
+     Long name: <i>{{instance.longname}}</i>
+     <br>
+     Description: <i>{{instance.description}}</i>
+     <br>
+     {% if instance in intersections %}
+     <i>This instance already exists in DDSS.</i>
+     {% endif %}
+     <br>
+</blockquote>
+{% endif %}
+{% endfor %}
+</div>
+<script>
+    const checkbox = document.getElementById('show_elements');
+    const box = document.getElementById('ifcelement');
+     
+    checkbox.addEventListener('click', function handleClick() {
+       if (checkbox.checked) {
+          box.style.visibility = 'visible';
+       } else {
+          box.style.visibility = 'hidden';
+       }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends 'sidebar/template_add_data.html' %}
+{% block content %}
+<p class="text-gray-900 text-base no-underline hover:no-underline font-extrabold text-xl" align="center"><b><u>Select AIM</u></b></p>
+<div style="text-align: center;">
+<br>
+<br>
+    <b>Select an AIM to which data will be added.</b>
+    <br><br>
+{% if existing_aims == check %}
+<a><i>There are no existing AIM's yet. Please add a new AIM.</i></a>
+{% else %}
+ {% for aim in existing_aims %}
+ <form action="{% url 'app:dd_select_existing_aim' %}" method="post" style="display:inline;">
+    {% csrf_token %}
+    <input type="hidden" id="aim_namespace" name="aim_namespace" value="{{aim.namespace}}">
+    <input type="hidden" id="aim_name" name="aim_name" value="{{aim.name}}">
+    <button type="submit"
+       class="btn-link text-red-500 no-underline hover:underline">{{aim.name}}</button>
+    {{data_external}}
+ </form>
+ <br>
+ {% endfor %}
+ {% endif %}
+ <br><br>
+ <form action="{% url 'app:dd_create_new_aim_1' %}">
+    <input type="submit" value="Or add a new AIM" />
+ </form>
+</div>
+{% endblock %}

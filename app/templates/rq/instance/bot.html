@@ -1,0 +1,76 @@
+{% extends 'sidebar/template_navigate_aims.html' %}
+{% block content %}
+<p class="text-gray-900 text-base no-underline hover:no-underline font-extrabold text-xl" align="center">
+    <b><u>{{instance_name}}</u></b>
+</p>
+<br>
+{% for data in instance_data %}
+<blockquote class="border-l-4 border-red-500 my-8 pl-8 md:pl-12">
+    <b>{{data.type}}</b>
+    <br>
+    {{data.type}} ID: <i>{{data.uri}}</i>
+    <br>
+    {{data.type}} name: <i>{{data.name}}</i>
+    <br>
+    {{data.type}} long name: <i>{{data.longname}}</i>
+    <br>
+    {{data.type}} description: <i>{{data.description}}</i>
+    <br>
+    {{data.type}} ifc guid: <i>{{data.guids}}</i>
+    <br>
+</blockquote>
+{% endfor %}
+<blockquote class="border-l-4 border-red-500 my-8 pl-8 md:pl-12">
+    <b>Documents related to this {{instance_type}}:</b>
+    <br>
+    {% for document in instance_documents %}
+    <form action="{% url 'app:instance_document' %}" method="post" style="display:inline;">
+        {% csrf_token %}
+        <input type="hidden" id="document_name" name="document_name" value="{{document.document_name}}">
+        <input type="hidden" id="document" name="document" value="{{document.document}}">
+        <button type="submit"
+            class="btn-link text-red-500 no-underline hover:underline"><i>{{document.document_name}}</i></button>
+        {{data_external}}
+    </form>
+    <br>
+    {% endfor %}
+</blockquote>
+<blockquote class="border-l-4 border-red-500 my-8 pl-8 md:pl-12">
+    <b>Hierarchy</b>
+    <br><br>
+    {% for parent in parent_instances %}
+    {% if parent.parent != None %}
+    <form action="{% url 'app:instance_bot' %}" method="post" style="display:inline;">
+        {% csrf_token %}
+        <input type="hidden" id="instance" name="instance" value="{{parent.parent}}">
+        <input type="hidden" id="instance_name" name="instance_name" value="{{parent.parent_name}}">
+        <input type="hidden" id="instance_type" name="instance_type" value="{{parent.parent_type}}">
+        <button type="submit"
+            class="btn-link text-red-500 no-underline hover:underline"><i>{{parent.parent_type}}: {{parent.parent_name}}</i></button>
+        {{data_external}}
+    </form>
+    <br>
+    {% endif %}
+    {% endfor %}
+    <blockquote class="border-l-4 border-grey-500 my-8 pl-8 md:pl-12">
+    <u><i>{{instance_type}}: {{instance_name}}</i></u>
+    <br>
+    <blockquote class="border-l-4 border-grey-500 my-8 pl-8 md:pl-12">
+    {% for child in child_instances %}
+    {% if child.child != None %}
+    <form action="{% url 'app:instance_bot' %}" method="post" style="display:inline;">
+        {% csrf_token %}
+        <input type="hidden" id="instance" name="instance" value="{{child.child}}">
+        <input type="hidden" id="instance_name" name="instance_name" value="{{child.child_name}}">
+        <input type="hidden" id="instance_type" name="instance_type" value="{{child.child_type}}">
+        <button type="submit"
+            class="btn-link text-red-500 no-underline hover:underline"><i>{{child.child_type}}: {{child.child_name}}</i></button>
+        {{data_external}}
+    </form>
+    <br>
+    {% endif %}
+    {% endfor %}
+</blockquote>
+    </blockquote>
+</blockquote>
+{% endblock %}

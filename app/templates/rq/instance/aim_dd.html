@@ -1,0 +1,77 @@
+{% extends 'sidebar/template_navigate_aims.html' %}
+{% block content %}
+<p class="text-gray-900 text-base no-underline hover:no-underline font-extrabold text-xl" align="center">
+    <b><u>{{aim_name}}</u></b>
+</p>
+<div style="text-align: center;">
+    <br>
+    <a style="font-size:80%;"><i>{{aim_namespace}}</i></a>
+    <br><br>
+    <form method="post">
+        {% csrf_token %}
+        <button formaction="{% url 'app:instance_aim_content' %}" type="submit" id="content" name="content"><i>Sort per
+                data type</i></button>
+        <button style="background-color: #b20000;" formaction="{% url 'app:instance_aim_dd' %}" type="submit" id="dd"
+            name="dd"><i>Sort per data drop</i></button>
+        {{data_external}}
+    </form>
+</div>
+<br>
+{% for data_drop in data_drops %}
+<blockquote class="border-l-4 border-red-500 my-8 pl-8 md:pl-12">
+    <b>Data drop</b>
+    <br>
+    <form action="{% url 'app:instance_datadrop' %}" method="post" style="display:inline;">
+        Data drop ID:
+        {% csrf_token %}
+        <button type="submit" id="data_drop" name="data_drop" value="{{data_drop.data_drop}}"
+             class="btn-link text-red-500 no-underline hover:underline"><i>{{data_drop.data_drop}}</i></button>
+        {{data_external}}
+   </form>
+    <br>
+    Uploaded on: <i>{{data_drop.datetime}}</i>
+    <br>
+    <form method="post">
+        Uploaded by:
+        {% csrf_token %}
+        <input type="hidden" id="actor_name" name="actor_name" value="{{data_drop.upload_actor_name}}">
+        <input type="hidden" id="actor" name="actor" value="{{data_drop.upload_actor}}">
+        <button formaction="{% url 'app:instance_actor' %}" type="submit"
+            class="btn-link text-red-500 no-underline hover:underline"><i>{{data_drop.upload_actor_name}}</i></button>
+        {{data_external}}
+    </form>
+    <br>
+    <b>Documents related to this data drop:</b>
+    <br>
+    {% for document in documents %}
+    {% if document.data_drop == data_drop.data_drop %}
+    <br>
+    <form action="{% url 'app:instance_document' %}" method="post" style="display:inline;">
+        {% csrf_token %}
+        <input type="hidden" id="document_name" name="document_name" value="{{document.document_name}}">
+        <input type="hidden" id="document" name="document" value="{{document.document}}">
+        <button type="submit"
+            class="btn-link text-red-500 no-underline hover:underline"><i>{{document.document_name}}</i></button>
+        {{data_external}}
+        | {{document.type}}
+    </form>
+    {% endif %}
+    {% endfor %}
+    <br><br>
+    <b>Events related to this data drop:</b>
+    {% for event in events %}
+    {% if event.data_drop == data_drop.data_drop %}
+    <br>
+    <form action="{% url 'app:instance_event' %}" method="post" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit" id="event" name="event" value="{{event.event}}"
+            class="btn-link text-red-500 no-underline hover:underline"><i>{{event.event_type}} |
+                {{event.event_datetime}} | {{event.event_description}} | id:
+                {{event.event}}</i></button>
+        {{data_external}}
+    </form>
+    {% endif %}
+    {% endfor %}
+</blockquote>
+{% endfor %}
+{% endblock %}
