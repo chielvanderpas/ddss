@@ -1,14 +1,56 @@
 {% extends 'sidebar/template_home.html' %}
 {% block content %}
-<p class="py-3">{{welcome_message}}</p>
-<p class="py-3">{{output}}</p>  
-<p class="py-6">
-    👋 Welcome fellow <a class="text-red-500 no-underline hover:underline" href="https://www.tailwindcss.com">Tailwind CSS</a> fan.  This starter template provides a starting point to create your own helpdesk / faq / knowledgebase articles using Tailwind CSS and vanilla Javascript.
-</p>
-<p class="py-6">
-   The basic help article layout is available and all using the default Tailwind CSS classes (although there are a few hardcoded style tags). If you are going to use this in your project, you will want to convert the classes into components.
-</p>
-<blockquote class="border-l-4 border-red-500 italic my-8 pl-8 md:pl-12">
-   Example of blockquote - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam at ipsum eu nunc commodo posuere et sit amet ligula.
+<div style="text-align: center;">
+<p class="text-gray-900 text-base no-underline hover:no-underline font-extrabold text-xl" align="center">
+   <b><u>Home</u></b></p>
+   <br>
+<p class="py-3">{{welcome_message}}{{output}}</p> 
+</div>
+<!-- <p class="py-6"></p> -->
+<blockquote class="border-l-4 border-red-500 my-8 pl-8 md:pl-12">
+   <b>Number of AIM's in DDSS</b>
+   <br>
+   <a style="font-size:250%;">{{aim_count}}</a>
+   <form>
+      <br>
+      <input formaction="{% url 'app:dd_create_new_aim_1' %}" type="submit" value="Create new AIM"/>
+      <br>
+  </form>
+</blockquote>
+<blockquote class="border-l-4 border-red-500 my-8 pl-8 md:pl-12">
+   <b>Most recently edited AIM's</b>
+   <br>
+   {% for aim in aims %}
+   <form action="{% url 'app:instance_aim_content' %}" method="post" style="display:inline;">
+      {% csrf_token %}
+      <input type="hidden" id="aim_name" name="aim_name" value="{{aim.aim_name}}">
+      <input type="hidden" id="aim_namespace" name="aim_namespace" value="{{aim.aim}}">
+      <button type="submit" class="btn-link text-red-500 no-underline hover:underline">{{aim.aim_name}}</button>
+      {{data_external}}
+      <br>
+  </form>
+  {% endfor %}
+<br>
+<form>
+ <input formaction="{% url 'app:content' %}" type="submit" value="View all AIM's"/>
+</form>
+</blockquote>
+<blockquote class="border-l-4 border-red-500 my-8 pl-8 md:pl-12">
+   <b>Most recent data drops</b>
+   <br>
+   {% for data_drop in data_drops %}
+   <form action="{% url 'app:instance_aim_content' %}" method="post" style="display:inline;">
+      {% csrf_token %}
+      <input type="hidden" id="data_drop" name="data_drop" value="{{datadrop.data_drop}}">
+      <input type="hidden" id="aim_namespace" name="aim_namespace" value="{{aim.namespace}}">
+      <button type="submit" class="btn-link text-red-500 no-underline hover:underline">{{data_drop.aim_name}} | {{data_drop.datetime}}</button>
+      {{data_external}}
+      <br>
+  </form>
+  {% endfor %}
+  <br>
+  <form>
+   <input formaction="{% url 'app:dd_welcome' %}" type="submit" value="Upload new data"/>
+</form>
 </blockquote>
 {% endblock %}

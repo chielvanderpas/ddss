@@ -1,14 +1,15 @@
 {% extends 'auth_template.html' %}
 {% block content %}
+<div style="text-align: center;">
   <p class="py-6">{{welcome_message}}</p>
       <form method="post">
          {% csrf_token %}
          <fieldset>
          <label for="username">E-mail address:</label>
-         <input type="text" id="username" name="username" required align="left"><br><br>
+         <input size="30" type="text" id="username" name="username" required align="left"><br><br>
          {{data_external}}
          <label for="password">Password:</label>
-         <input type="password" id="password" name="password" required align="left"><br><br>
+         <input size="30" type="password" id="password" name="password" required align="left"><br><br>
          {{data_external}}
          <br>
          <input formaction="{% url 'app:login_proceed' %}" type="submit" value="Login">
@@ -19,4 +20,5 @@
        <br><br><br><br>
        <b><i>{{output}}</i></b>
        <br><br>
+</div>
 {% endblock %}

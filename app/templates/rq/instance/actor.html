@@ -1,7 +1,10 @@
 {% extends 'sidebar/template_navigate_aims.html' %}
 {% block content %}
-<p class="py-3">{{welcome_message}}</p>
-{% for actor in output %}  
+<p class="text-gray-900 text-base no-underline hover:no-underline font-extrabold text-xl" align="center">
+     <b><u>{{actor_name}}</u></b></p>
+<br>
+<br>
+{% for actor in actors %}
 <blockquote class="border-l-4 border-red-500 my-8 pl-8 md:pl-12">
      <b>Actor</b>
      <br>
@@ -14,4 +17,26 @@
      Phone number: <i>{{actor.phone_number}}</i>
 </blockquote>
 {% endfor %}
+<blockquote class="border-l-4 border-red-500 my-8 pl-8 md:pl-12">
+     <b>Data drops uploaded by {{actor_name}}:</b>
+     {% for data_drop in data_drops %}
+     <br>
+     <form action="{% url 'app:instance_datadrop' %}" method="post" style="display:inline;">
+          {% csrf_token %}
+          <button type="submit" id="data_drop" name="data_drop" value="{{data_drop.data_drop}}"
+               class="btn-link text-red-500 no-underline hover:underline"><i>{{data_drop.data_drop}}</i></button>
+          {{data_external}}
+          <br>
+          Uploaded on: <i>{{data_drop.datetime}}</i>
+          <br>
+          Uploaded by:
+          <input type="hidden" id="actor_name" name="actor_name" value="{{data_drop.upload_actor_name}}">
+          <input type="hidden" id="actor" name="actor" value="{{data_drop.upload_actor}}">
+          <button formaction="{% url 'app:instance_actor' %}" type="submit"
+               class="btn-link text-red-500 no-underline hover:underline"><i>{{data_drop.upload_actor_name}}</i></button>
+          {{data_external}}
+          <br>
+     </form>
+     {% endfor %}
+</blockquote>
 {% endblock %}

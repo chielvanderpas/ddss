@@ -1,21 +1,35 @@
 {% extends 'sidebar/template_none.html' %}
 {% block content %}
-<form action="{% url 'app:org_edit' %}" method="post">
+<p class="text-gray-900 text-base no-underline hover:no-underline font-extrabold text-xl" align="center">
+   <b><u>Organisation structure</u></b>
+</p>
+<div style="text-align: center;">
+   <br>
+   <a style="font-size:80%;"><i>{{current_org}}</i></a>
+   <br><br>
+   <a>{{message}}</a>
+</div>
+<blockquote class="border-l-4 border-red-500 my-8 pl-8 md:pl-12">
+   <b>Select a user to edit</b>
+   <br><br>
+{% for actor in existing_users %}
+<form action="{% url 'app:org_actor_edit' %}" method="post" style="display:inline;">
    {% csrf_token %}
-      <select type="text" id="user" name="user" required align="left">
-         <option value="" disabled selected>Select a user</option>
-         <option value="" disabled></option>
-         {% for user in existing_users %} 
-         <option value="{{ user.id }}, {{user.name}}, {{user.email}}">{{ user.name }}</option>
-         {% endfor %}
-      </select>   
+   <input type="hidden" id="actor_id" name="actor_id" value="{{actor.id}}">
+   <input type="hidden" id="actor_name" name="actor_name" value="{{actor.name}}">
+   <input type="hidden" id="actor_email" name="actor_email" value="{{actor.email}}">
+   <input type="hidden" id="actor_organization" name="actor_organization" value="{{actor.organization}}">
+   <input type="hidden" id="actor_phone_number" name="actor_phone_number" value="{{actor.phone_number}}">
+   <input type="hidden" id="actor_role" name="actor_role" value="{{actor.role}}">
+   <button type="submit"
+      class="btn-link text-red-500 no-underline hover:underline">{{actor.name}} <i>({{actor.email}})</i></button>
    {{data_external}}
-   <br>
-   <br>
-   <input type="submit" value="Edit user"/>
 </form>
 <br>
-<form action="{% url 'app:org_add' %}">
-   <input type="submit" value="Add new user"/>
+{% endfor %}
+<br><br>
+<form action="{% url 'app:org_actor_add' %}">
+   <input type="submit" value="Or add a new user" />
 </form>
+</blockquote>
 {% endblock %}

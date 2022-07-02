@@ -22,8 +22,10 @@ urlpatterns = [
     ### settings models ########
     path('settings/', views.settings, name='settings'),
     path('org/', views.edit_org, name='org'),
-    path('org/add/', views.edit_org_add, name='org_add'),
-    path('org/edit/', views.edit_org_edit, name='org_edit'),
+    path('org/actor/add/1/', views.edit_org_add, name='org_actor_add'),
+    path('org/actor/add/2/', views.edit_org_add_proceed, name='org_actor_add_proceed'),
+    path('org/actor/edit/1/', views.edit_org_edit, name='org_actor_edit'),
+    path('org/actor/edit/2/', views.edit_org_edit_proceed, name='org_actor_edit_proceed'),
     ############################
     ### data request models ####
     path('search/content/', views.content, name='content'),
@@ -31,8 +33,10 @@ urlpatterns = [
     path('instance/aim/dd/', views.instance_aim_dd, name='instance_aim_dd'),
     path('instance/event/', views.instance_event, name='instance_event'),
     path('instance/document/', views.instance_document, name='instance_document'),
+    path('instance/document/download/', views.instance_document_download, name='instance_document_download'),
     path('instance/actor/', views.instance_actor, name='instance_actor'),
     path('instance/building/', views.instance_bot, name='instance_bot'),
+    path('instance/datadrop/', views.instance_datadrop, name='instance_datadrop'),
     path('search/start/', views.search_start, name='search_start'),
     # path('search/results/', views.search_results, name='search_results'),
     path('search/sparql_query/1/', views.sparql_query_1, name='sparql_query_1'),  
@@ -40,12 +44,11 @@ urlpatterns = [
     ############################
     ### data drop models #######
     path('dd/welcome/', views.dd_welcome, name='dd_welcome'),
-    path('dd/start/', views.dd_start, name='dd_start'),
     path('dd/continue/', views.dd_continue, name='dd_continue'),
+    path('dd/select_aim/', views.dd_select_aim, name='dd_select_aim'),
+    path('dd/existing_aim/', views.dd_select_existing_aim, name='dd_select_existing_aim'),
     path('dd/new_aim/1/', views.dd_create_new_aim_1, name='dd_create_new_aim_1'),
     path('dd/new_aim/2/', views.dd_create_new_aim_2, name='dd_create_new_aim_2'),
-    path('dd/existing_aim/1/', views.dd_select_existing_aim_1, name='dd_select_existing_aim_1'),
-    path('dd/existing_aim/2/', views.dd_select_existing_aim_2, name='dd_select_existing_aim_2'),
     path('dd/new_event/1/', views.dd_create_new_event_1, name='dd_create_new_event_1'),
     path('dd/extra_event/1/', views.dd_create_extra_event_1, name='dd_create_extra_event_1'),
     path('dd/new_event/2/', views.dd_create_new_event_2, name='dd_create_new_event_2'),

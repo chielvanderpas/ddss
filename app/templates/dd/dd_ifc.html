@@ -1,97 +1,230 @@
 {% extends 'sidebar/template_add_data.html' %}
 {% block content %}
-<p class="text-gray-900 text-base no-underline hover:no-underline font-extrabold text-xl" align="center"><b><u>Extract building data</u></b></p>
+<p class="text-gray-900 text-base no-underline hover:no-underline font-extrabold text-xl" align="center"><b><u>Extract
+         building data</u></b></p>
 <br>
 <p class="py-6">Below, you can find all site-, building-, storey-, space-, and element instances in the ifc file.</p>
 <br>
-{% for instance in model_data %}  
-{% if instance.type != 'Element' %}
+{% for site_instance in model_data %}
+{% if site_instance.type == 'Site' %}
 <blockquote class="border-l-4 border-red-500 my-8 pl-8 md:pl-12">
-     <b>Instance</b>
-     <br>
-     Type: <i>{{instance.type}}</i>
-     <br>
-     GUID: <i>{{instance.guid}}</i>
-     <br>
-     Name: <i>{{instance.name}}</i>
-     <br>
-     Long name: <i>{{instance.longname}}</i>
-     <br>
-     Description: <i>{{instance.description}}</i>
-     <br>
-     {% if instance in intersections %}
-     <i>This instance already exists in DDSS.</i>
-     {% elif related_new_guid == instance.guid %}
-     <i>This instance already exists in DDSS.</i>
-     {% elif instance.type not in type_check %}
-     {% else %}
-     <form method="post">
-        {% csrf_token %}
-        <a><i>If applicable, select instance that is the same as this instance:</i></a>
-        <input type="hidden" id="related_new" name="related_new" value="{{instance.guid}}">
-        <select style="width: 36ch;" type="text" id="related_original" name="related_original" align="left">
-           <option value="" disabled selected>Select instance</option>
-           <option value="" disabled></option>
-           {% for e_instance in existing_data %}
-           {% if e_instance.type == instance.type %}
-           <option value="{{ e_instance.guid }}">{{ e_instance.name }}</option>
-           {% endif %}
-           {% endfor %}
-           <br>
-           <input formaction="{% url 'app:dd_upload_file_4' %}" type="submit" value="Create link"/>
-        </select>
-     </form>
-     {% endif %}
-     <br>
+   <b>Site</b>
+   <br>
+   Name: <i>{{site_instance.name}}</i>
+   <br>
+   GUID: <i>{{site_instance.guid}}</i>
+   <br>
+   Long name: <i>{{site_instance.longname}}</i>
+   <br>
+   Description: <i>{{instance.description}}</i>
+   <br>
+   {% if site_instance.guid in intersections %}
+   <i>This instance already exists in DDSS.</i>
+   {% elif related_new_guid == site_instance.guid %}
+   <i>This instance already exists in DDSS.</i>
+   {% elif site_instance.type not in type_check %}
+   {% else %}
+   <form method="post">
+      {% csrf_token %}
+      <a><i>If applicable, select instance that is the same as this instance:</i></a>
+      <input type="hidden" id="related_new" name="related_new" value="{{site_instance.guid}}">
+      <select style="width: 36ch;" type="text" id="related_original" name="related_original" align="left">
+         <option value="" disabled selected>Select instance</option>
+         <option value="" disabled></option>
+         {% for e_instance in existing_data %}
+         {% if e_instance.type == site_instance.type %}
+         <option value="{{ e_instance.guid }}">{{ e_instance.name }}</option>
+         {% endif %}
+         {% endfor %}
+         <br>
+         <input formaction="{% url 'app:dd_upload_file_4' %}" type="submit" value="Create link" />
+      </select>
+   </form>
+   {% endif %}
+   <br>
+   {% for building_instance in model_data %}
+   {% for rel_instance in relations %}
+   {% if rel_instance.child_guid == building_instance.guid and rel_instance.parent_guid == site_instance.guid %}
+   {% if building_instance.type == 'Building' %}
+   <blockquote class="border-l-4 border-grey-500 my-8 pl-8 md:pl-12">
+      <b>Building</b>
+      <br>
+      Name: <i>{{building_instance.name}}</i>
+      <br>
+      GUID: <i>{{building_instance.guid}}</i>
+      <br>
+      Long name: <i>{{building_instance.longname}}</i>
+      <br>
+      Description: <i>{{instance.description}}</i>
+      <br>
+      {% if building_instance.guid in intersections %}
+      <i>This instance already exists in DDSS.</i>
+      {% elif related_new_guid == building_instance.guid %}
+      <i>This instance already exists in DDSS.</i>
+      {% elif building_instance.type not in type_check %}
+      {% else %}
+      <form method="post">
+         {% csrf_token %}
+         <a><i>If applicable, select instance that is the same as this instance:</i></a>
+         <input type="hidden" id="related_new" name="related_new" value="{{building_instance.guid}}">
+         <select style="width: 36ch;" type="text" id="related_original" name="related_original" align="left">
+            <option value="" disabled selected>Select instance</option>
+            <option value="" disabled></option>
+            {% for e_instance in existing_data %}
+            {% if e_instance.type == building_instance.type %}
+            <option value="{{ e_instance.guid }}">{{ e_instance.name }}</option>
+            {% endif %}
+            {% endfor %}
+            <br>
+            <input formaction="{% url 'app:dd_upload_file_4' %}" type="submit" value="Create link" />
+         </select>
+      </form>
+      {% endif %}
+      <br>
+      {% for storey_instance in model_data %}
+      {% for rel_instance in relations %}
+      {% if rel_instance.child_guid == storey_instance.guid and rel_instance.parent_guid == building_instance.guid %}
+      {% if storey_instance.type == 'Storey' %}
+      <blockquote class="border-l-4 border-grey-500 my-8 pl-8 md:pl-12">
+         <b>Storey</b>
+         <br>
+         Name: <i>{{storey_instance.name}}</i>
+         <br>
+         GUID: <i>{{storey_instance.guid}}</i>
+         <br>
+         Long name: <i>{{storey_instance.longname}}</i>
+         <br>
+         Description: <i>{{instance.description}}</i>
+         <br>
+         {% if storey_instance.guid in intersections %}
+         <i>This instance already exists in DDSS.</i>
+         {% elif related_new_guid == storey_instance.guid %}
+         <i>This instance already exists in DDSS.</i>
+         {% elif storey_instance.type not in type_check %}
+         {% else %}
+         <form method="post">
+            {% csrf_token %}
+            <a><i>If applicable, select instance that is the same as this instance:</i></a>
+            <input type="hidden" id="related_new" name="related_new" value="{{storey_instance.guid}}">
+            <select style="width: 36ch;" type="text" id="related_original" name="related_original" align="left">
+               <option value="" disabled selected>Select instance</option>
+               <option value="" disabled></option>
+               {% for e_instance in existing_data %}
+               {% if e_instance.type == storey_instance.type %}
+               <option value="{{ e_instance.guid }}">{{ e_instance.name }}</option>
+               {% endif %}
+               {% endfor %}
+               <br>
+               <input formaction="{% url 'app:dd_upload_file_4' %}" type="submit" value="Create link" />
+            </select>
+         </form>
+         {% endif %}
+         <br>
+         {% for space_instance in model_data %}
+         {% for rel_instance in relations %}
+         {% if rel_instance.child_guid == space_instance.guid and rel_instance.parent_guid == storey_instance.guid %}
+         {% if space_instance.type == 'Space' %}
+         <blockquote class="border-l-4 border--500 my-8 pl-8 md:pl-12">
+            <b>Space</b>
+            <br>
+            Name: <i>{{space_instance.name}}</i>
+            <br>
+            GUID: <i>{{space_instance.guid}}</i>
+            <br>
+            Long name: <i>{{space_instance.longname}}</i>
+            <br>
+            Description: <i>{{instance.description}}</i>
+            <br>
+            {% if space_instance.guid in intersections %}
+            <i>This instance already exists in DDSS.</i>
+            {% elif related_new_guid == space_instance.guid %}
+            <i>This instance already exists in DDSS.</i>
+            {% elif space_instance.type not in type_check %}
+            {% else %}
+            <form method="post">
+               {% csrf_token %}
+               <a><i>If applicable, select instance that is the same as this instance:</i></a>
+               <input type="hidden" id="related_new" name="related_new" value="{{space_instance.guid}}">
+               <select style="width: 36ch;" type="text" id="related_original" name="related_original" align="left">
+                  <option value="" disabled selected>Select instance</option>
+                  <option value="" disabled></option>
+                  {% for e_instance in existing_data %}
+                  {% if e_instance.type == space_instance.type %}
+                  <option value="{{ e_instance.guid }}">{{ e_instance.name }}</option>
+                  {% endif %}
+                  {% endfor %}
+                  <br>
+                  <input formaction="{% url 'app:dd_upload_file_4' %}" type="submit" value="Create link" />
+               </select>
+            </form>
+            {% endif %}
+            <br>
+         </blockquote>
+         {% endif %}
+         {% endif %}
+         {% endfor %}
+         {% endfor %}
+      </blockquote>
+      {% endif %}
+      {% endif %}
+      {% endfor %}
+      {% endfor %}
+   </blockquote>
+   {% endif %}
+   {% endif %}
+   {% endfor %}
+   {% endfor %}
 </blockquote>
 {% endif %}
 {% endfor %}
-<br><br>
+<br>
+<br>
+<br>
 <div style="text-align: center;">
-<form method="post">
-    {% csrf_token %}
-    <input formaction="{% url 'app:dd_upload_file_5' %}" type="submit" value="Continue"/>
-</form>
+   <form method="post">
+      {% csrf_token %}
+      <input formaction="{% url 'app:dd_upload_file_5' %}" type="submit" value="Continue" />
+   </form>
 </div>
 <br><br>
-<form>
-    <a><i>Check to show ifc-elements</i></a>
-    <input type="checkbox" id="show_elements" name="show_elements" align="left">
-    </form>
+<!-- <form>
+   <a><i>Check to show ifc-elements</i></a>
+   <input type="checkbox" id="show_elements" name="show_elements" align="left">
+</form>
 <div style="visibility:hidden;" id="ifcelement" name="ifcelement">
-{% for instance in model_data %}  
-{% if instance.type == 'Element' %}
-<blockquote class="border-l-4 border-red-500 my-8 pl-8 md:pl-12">
-     <b>Instance</b>
-     <br>
-     Type: <i>{{instance.type}}</i>
-     <br>
-     GUID: <i>{{instance.guid}}</i>
-     <br>
-     Name: <i>{{instance.name}}</i>
-     <br>
-     Long name: <i>{{instance.longname}}</i>
-     <br>
-     Description: <i>{{instance.description}}</i>
-     <br>
-     {% if instance in intersections %}
-     <i>This instance already exists in DDSS.</i>
-     {% endif %}
-     <br>
-</blockquote>
-{% endif %}
-{% endfor %}
+   {% for instance in model_data %}
+   {% if instance.type == 'Element' %}
+   <blockquote class="border-l-4 border-red-500 my-8 pl-8 md:pl-12">
+      <b>Instance</b>
+      <br>
+      Type: <i>{{instance.type}}</i>
+      <br>
+      GUID: <i>{{instance.guid}}</i>
+      <br>
+      Name: <i>{{instance.name}}</i>
+      <br>
+      Long name: <i>{{instance.longname}}</i>
+      <br>
+      Description: <i>{{instance.description}}</i>
+      <br>
+      {% if instance in intersections %}
+      <i>This instance already exists in DDSS.</i>
+      {% endif %}
+      <br>
+   </blockquote>
+   {% endif %}
+   {% endfor %}
 </div>
 <script>
-    const checkbox = document.getElementById('show_elements');
-    const box = document.getElementById('ifcelement');
-     
-    checkbox.addEventListener('click', function handleClick() {
-       if (checkbox.checked) {
-          box.style.visibility = 'visible';
-       } else {
-          box.style.visibility = 'hidden';
-       }
-    });
-</script>
+   const checkbox = document.getElementById('show_elements');
+   const box = document.getElementById('ifcelement');
+
+   checkbox.addEventListener('click', function handleClick() {
+      if (checkbox.checked) {
+         box.style.visibility = 'visible';
+      } else {
+         box.style.visibility = 'hidden';
+      }
+   });
+</script> -->
 {% endblock %}

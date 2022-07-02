@@ -1,20 +1,39 @@
 {% extends 'sidebar/template_none.html' %}
 {% block content %}
-<form action="{% url 'app:org' %}">
-      <select type="text" id="users" name="users" required align="left">
-         <option value="" disabled selected>Select a user</option>
-         <option value="" disabled></option>
-         {% for user in existing_users %} 
-         <option value="{{ item }}">{{ user }}</option>
-         {% endfor %}
-      </select>   
-   {{data_external}}
-   <br>
-   <br>
-   <input type="submit" value="Edit user"/>
-</form>
+<p class="text-gray-900 text-base no-underline hover:no-underline font-extrabold text-xl" align="center"><b><u>Edit
+               user</u></b></p>
 <br>
-<form action="{% url 'app:org_add' %}">
-   <input type="submit" value="Add new user"/>
-</form>
+<blockquote class="border-l-4 border-red-500 my-8 pl-8 md:pl-12">
+     <a><b>Edit user details</b></a>
+     <br><br>
+     <form action="{% url 'app:org_actor_add_proceed' %}" method="post">
+          {% csrf_token %}
+          <fieldset>
+               <label for="name">Name:</label>
+               <input size="40" type="text" id="name" name="name" required align="left">
+               {{data_external}}
+               <br><br>
+               <label for="email">E-mail address:</label>
+               <input size="40" type="email" id="email" name="email" placeholder="name@provider.com" required align="left">
+               {{data_external}}
+               <br><br>
+               <label for="phone_number">Phone number:</label>
+               <input size="40" type="tel" id="phone_number" name="phone_number"
+                    pattern="+[0-9]" placeholder="+31612345678" required><br><br>
+               {{data_external}}
+               <label for="role">Role:</label>
+               <input size="40" type="text" list="roles" id="role" name="role" placeholder="Select or type yourself" required align="left">
+               <datalist id="roles">
+                   {% for role in roles %}
+                   <option value="{{role}}"></option>
+                   {% endfor %}
+               </datalist>
+               {{data_external}}
+               <br><br>
+               <a class="py-4 text-gray-600 text-sm"><i>Please note that adding an actor via this method will enable you to relate data to this actor, but this will not create a DDSS user account for said actor. To create a new user account, please log out and register as a new user.</i></a>
+               <br><br>
+               <input type="submit" value="Add actor">
+          </fieldset>
+     </form>
+</blockquote>
 {% endblock %}

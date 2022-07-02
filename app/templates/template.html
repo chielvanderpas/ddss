@@ -9,7 +9,6 @@
       <meta name="description" content="">
       <meta name="keywords" content="">
     <link rel="stylesheet" href="/static/css/tailwind.min.css"/>
-      <!--Replace with your tailwind.css once created-->
       <style>
          @import url('https://fonts.googleapis.com/css?family=Lato');
          html { font-family: 'Lato', sans-serif; }
@@ -20,8 +19,10 @@
       <nav id="header" class="fixed w-full z-10 top-0 bg-white border-b border-gray-400">
          <div class="w-full container mx-auto flex flex-wrap items-center justify-between mt-0 py-4">
             <div class="pl-4 flex items-center">
+               &nbsp; &nbsp; &nbsp;
                <svg class="h-5 pr-3 fill-current text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                  <path d="M0 2C0 .9.9 0 2 0h16a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2zm14 12h4V2H2v12h4c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2zM5 9l2-2 2 2 4-4 2 2-6 6-4-4z"/>
+                  <path d="M0 13a1.5 1.5 0 0 0 1.5 1.5h13A1.5 1.5 0 0 0 16 13V6a1.5 1.5 0 0 0-1.5-1.5h-13A1.5 1.5 0 0 0 0 6v7zM2 3a.5.5 0 0 0 .5.5h11a.5.5 0 0 0 0-1h-11A.5.5 0 0 0 2 3zm2-2a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 0-1h-7A.5.5 0 0 0 4 1z"/>
+                  <!-- Reference: https://icons.getbootstrap.com/icons/collection-fill/ -->
                </svg>
                <a class="text-gray-900 text-base no-underline hover:no-underline font-extrabold text-xl"  href="{% url 'app:index' %}"> 
                DDSS
@@ -77,6 +78,9 @@
         <!--Title-->
             <div class="font-sans">
                <span class="text-base text-red-500 font-bold">&laquo;</span> <a href="javascript:history.back()" class="text-base md:text-sm text-red-500 font-bold no-underline hover:underline">Go back</a>
+               {% if aim_name != None %}
+               <a style="float:right;" class="text-base md:text-sm text-red-500 font-bold no-underline">Current AIM: <i>{{aim_name}}</i></a>
+               {% endif %}
                <br><br>
             </div>
         <!--/Title-->
@@ -107,5 +111,63 @@
         </div>
      </footer>
         <!--/Footer-->
+        <!--Mobile navigation menu -->
+        <script>
+         /*Toggle dropdown list*/
+         /*https://gist.github.com/slavapas/593e8e50cf4cc16ac972afcbad4f70c8*/
+         
+         var navMenuDiv = document.getElementById("nav-content");
+         var navMenu = document.getElementById("nav-toggle");
+         
+         var helpMenuDiv = document.getElementById("menu-content");
+         var helpMenu = document.getElementById("menu-toggle");
+         
+         document.onclick = check;
+         
+         function check(e){
+           var target = (e && e.target) || (event && event.srcElement);
+         
+          
+           //Nav Menu
+           if (!checkParent(target, navMenuDiv)) {
+         	// click NOT on the menu
+         	if (checkParent(target, navMenu)) {
+         	  // click on the link
+         	  if (navMenuDiv.classList.contains("hidden")) {
+         		navMenuDiv.classList.remove("hidden");
+         	  } else {navMenuDiv.classList.add("hidden");}
+         	} else {
+         	  // click both outside link and outside menu, hide menu
+         	  navMenuDiv.classList.add("hidden");
+         	}
+           }
+           
+           //Help Menu
+           if (!checkParent(target, helpMenuDiv)) {
+         	// click NOT on the menu
+         	if (checkParent(target, helpMenu)) {
+         	  // click on the link
+         	  if (helpMenuDiv.classList.contains("hidden")) {
+         		helpMenuDiv.classList.remove("hidden");
+         	  } else {helpMenuDiv.classList.add("hidden");}
+         	} else {
+         	  // click both outside link and outside menu, hide menu
+         	  helpMenuDiv.classList.add("hidden");
+         	}
+           }
+           
+         }
+         
+         function checkParent(t, elm) {
+           while(t.parentNode) {
+         	if( t == elm ) {return true;}
+         	t = t.parentNode;
+           }
+           return false;
+         }
+         
+         
+      </script>
+      <!--/Mobile navigation menu -->
      </body>
      </html>

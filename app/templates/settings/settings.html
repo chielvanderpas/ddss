@@ -2,16 +2,34 @@
 {% block content %}
 <p class="py-3">{{welcome_message}}</p>  
 <blockquote class="border-l-4 border-red-500 my-8 pl-8 md:pl-12">
-   <b>My data:</b>
+   <b>My data</b>
    <br>
    Name: <i>{{full_name}}</i>
    <br>
    E-mail: <i>{{email}}</i>
    <br>
-   Phone number: <i>{{phone_number}}</i>
+   {% for info in user_info %}
+   Part of organization: <i>{{info.organization}}</i>
+   <br>
+   Phone number: <i>{{info.phone_number}}</i>
+   <br>
+   Role: <i>{{info.role}}</i>
+   <br>
+   <br>
+   <form action="{% url 'app:org_actor_edit' %}" method="post">
+      {% csrf_token %}
+      <input type="hidden" id="actor_id" name="actor_id" value="{{info.user}}">
+      <input type="hidden" id="actor_name" name="actor_name" value="{{full_name}}">
+      <input type="hidden" id="actor_email" name="actor_email" value="{{email}}">
+      <input type="hidden" id="actor_organization" name="actor_organization" value="{{info.organization}}">
+      <input type="hidden" id="actor_phone_number" name="actor_phone_number" value="{{info.phone_number}}">
+      <input type="hidden" id="actor_role" name="actor_role" value="{{info.role}}">
+      <input type="submit" value="Edit my data"/>
+   </form>
+   {% endfor %}
 </blockquote>
 <blockquote class="border-l-4 border-red-500 my-8 pl-8 md:pl-12">
-   <b>DDSS settings:</b>
+   <b>DDSS settings</b>
    <br>
    SPARQL endpoint 1: <i>{{sparql_endpoint_1}}</i>
    <br>
@@ -20,10 +38,19 @@
    Storage location of documents: <i>{{document_storage_location}}</i>
    <br>
    AIM default namespace: <i>{{aim_default_namespace}}</i>
+   <br>
+   Organization default namespace: <i>{{org_default_namespace}}</i>
+   <br>
+   Current organization: <i>{{current_org}}</i>
    <br><br>
    <a class="py-4 text-gray-600 text-sm"><i>Settings for the DDSS system can be changed in the settings.py instance of the DDSS system.</i></a>
 </blockquote>
+<blockquote class="border-l-4 border-red-500 my-8 pl-8 md:pl-12">
+   <b>Organization</b>
+   <br>
+   <br>
 <form action="{% url 'app:org' %}">
-   <input type="submit" value="Edit organisational structure"/>
+   <input type="submit" value="Edit organizational structure"/>
 </form>
+</blockquote>
 {% endblock %}

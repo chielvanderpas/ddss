@@ -1,26 +1,36 @@
 {% extends 'auth_template.html' %}
 {% block content %}
+<div style="text-align: center;">
   <p class="py-6">Welcome, please fill in your personal details to create an account.</p>
       <form action="{% url 'app:register_proceed' %}" method="post">
          {% csrf_token %}
          <fieldset>
-         <label for="first_name">First name</label>
-         <input type="text" id="first_name" name="first_name" required align="left"><br><br>
+         <label for="first_name">First name:</label>
+         <input size="40" type="text" id="first_name" name="first_name" required align="left"><br><br>
          {{data_external}}
          <label for="last_name">Last name:</label>
-         <input type="text" id="last_name" name="last_name" required align="left"><br><br>
+         <input size="40" type="text" id="last_name" name="last_name" required align="left"><br><br>
          {{data_external}}
          <label for="email">E-mail address:</label>
-         <input type="email" id="email" name="email" required align="left" placeholder="name@provider.com"><br><br>
+         <input size="40" type="email" id="email" name="email" required align="left" placeholder="name@provider.com"><br><br>
          {{data_external}}
          <label for="phone_number">Phone number:</label>
-         <input type="tel" id="phone_number" name="phone_number" required align="left" placeholder="+31612345678" pattern="+[0-9]"><br><br>
+         <input size="40" type="tel" id="phone_number" name="phone_number" required align="left" placeholder="+31612345678" pattern="+[0-9]"><br><br>
          {{data_external}}
+         <label for="role">Role:</label>
+               <input size="40" size="40" type="text" list="roles" id="role" name="role" placeholder="Select or type yourself" required align="left">
+               <datalist id="roles">
+                   {% for role in roles %}
+                   <option value="{{role}}"></option>
+                   {% endfor %}
+               </datalist>
+         {{data_external}}
+         <br><br>
          <label for="password">Password:</label>
-         <input type="password" id="password" name="password" required align="left"><br><br>
+         <input size="40" type="password" id="password" name="password" required align="left"><br><br>
          {{data_external}}
          <label for="confirm_password">Confirm password:</label>
-         <input type="password" id="confirm_password" name="confirm_password" required align="left"><br><br>
+         <input size="40" type="password" id="confirm_password" name="confirm_password" required align="left"><br><br>
          {{data_external}}
          <script>
             var password = document.getElementById("password"),
@@ -41,4 +51,5 @@
        <br><br>
        {{output}}
        <br><br>
+       </div>
 {% endblock %}

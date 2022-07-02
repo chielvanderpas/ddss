@@ -1,4 +1,190 @@
 {% extends 'sidebar/template_navigate_aims.html' %}
 {% block content %}
+<p class="text-gray-900 text-base no-underline hover:no-underline font-extrabold text-xl" align="center">
+    <b><u>{{instance_name}}</u></b>
+</p>
+<br>
+{% for document in document_data %}
+<div style="text-align: center;">
+    <form method="post">
+        {% csrf_token %}
+        <input type="hidden" id="path" name="path" value="{{document.storage_location}}" />
+        <input formaction="{% url 'app:instance_document_download' %}" type="submit" value="Download document" />
+    </form>
+</div>
+<blockquote class="border-l-4 border-red-500 my-8 pl-8 md:pl-12">
+    <b>Document</b>
+    <br>
+    Document ID: <i>{{document.id}}</i>
+    <br>
+    Document name: <i>{{document.file_name}}</i>
+    <br>
+    Document description: <i>{{document.description}}</i>
+    <br>
+    Document type: <i>{{document.doc_type}}</i>
+    <br>
+    Content type: <i>{{document.content_type}}</i>
+    <br>
+    Status: <i>{{document.status}}</i>
+    <br>
+    Document needs to be preserved until: <i>{{document.preserve_until}}</i>
+    <br>
+    Optional unique identifiers: <i>{{document.unique_identifier}}</i>
+    <br>
+    Creation software: <i>{{document.creation_software}} | version {{document.creation_software_version}}</i>
+    <br>
+    {% if document.copy != None %}
+    <form method="post">
+        {% csrf_token %}
+        Copy in original format:
+        <input type="hidden" id="path" name="path" value="{{document.copy_storage_location}}" />
+        <button formaction="{% url 'app:instance_document_download' %}" type="submit" class="btn-link text-red-500 no-underline hover:underline"><i>{{document.copy_name}}</i></button>
+    </form>
+    {% endif %}
+</blockquote>
+{% endfor %}
+<blockquote class="border-l-4 border-red-500 my-8 pl-8 md:pl-12">
+    <b>Version history</b>
+    <br>
+    {% for newer_version in newer_versions %}
+    {% if newer_version.newer_version != None %}
+    <form action="{% url 'app:instance_document' %}" method="post" style="display:inline;">
+        {% csrf_token %}
+        <input type="hidden" id="document_name" name="document_name" value="{{newer_version.newer_version_name}}">
+        <input type="hidden" id="document" name="document" value="{{newer_version.newer_version}}">
+        <button type="submit"
+            class="btn-link text-red-500 no-underline hover:underline"><i>{{newer_version.newer_version_name}} |
+                {{newer_version.newer_version_status}}</i></button>
+        {{data_external}}
+    </form>
+    <br>
+    {% endif %}
+    {% endfor %}
+    {% for document in document_data %}
+    <i>{{document.file_name}} | {{document.status}}</i>
+    {% endfor %}
+    <br>
+    {% for prev_version in prev_versions %}
+    {% if prev_version.prev_version != None %}
+    <form action="{% url 'app:instance_document' %}" method="post" style="display:inline;">
+        {% csrf_token %}
+        <input type="hidden" id="document_name" name="document_name" value="{{prev_version.prev_version_name}}">
+        <input type="hidden" id="document" name="document" value="{{prev_version.prev_version}}">
+        <button type="submit"
+            class="btn-link text-red-500 no-underline hover:underline"><i>{{prev_version.prev_version_name}} |
+                {{prev_version.prev_version_status}}</i></button>
+        {{data_external}}
+    </form>
+    <br>
+    {% endif %}
+    {% endfor %}
+</blockquote>
+{% for data_drop in data_drops %}
+<blockquote class="border-l-4 border-red-500 my-8 pl-8 md:pl-12">
+    <b>Data drop</b>
+    <br>
+    <form action="{% url 'app:instance_datadrop' %}" method="post" style="display:inline;">
+        {% csrf_token %}
+        Part of data drop:
+        <button type="submit" id="data_drop" name="data_drop" value="{{data_drop.data_drop}}"
+            class="btn-link text-red-500 no-underline hover:underline"><i>{{data_drop.data_drop}}</i></button>
+        {{data_external}}
+    </form>
+    <br>
+    Uploaded on: <i>{{data_drop.datetime}}</i>
+    <br>
+    <form action="{% url 'app:instance_actor' %}" method="post" style="display:inline;">
+        {% csrf_token %}
+        Uploaded by:
+        <input type="hidden" id="actor_name" name="actor_name" value="{{data_drop.upload_actor_name}}">
+        <input type="hidden" id="actor" name="actor" value="{{data_drop.upload_actor}}">
+        <button type="submit"
+            class="btn-link text-red-500 no-underline hover:underline"><i>{{data_drop.upload_actor_name}}</i></button>
+        {{data_external}}
+    </form>
+    <br> 
+    {% for document_interaction in data_drops2 %}
+    Document interaction type:
+    <i>{{document_interaction}}</i>
+    <br>
+    {% endfor %}
+    <form action="{% url 'app:instance_actor' %}" method="post" style="display:inline;">
+        {% csrf_token %}
+        Responsible actor:
+        <input type="hidden" id="actor_name" name="actor_name" value="{{data_drop.resp_actor_name}}">
+        <input type="hidden" id="actor" name="actor" value="{{data_drop.resp_actor}}">
+        <button type="submit"
+            class="btn-link text-red-500 no-underline hover:underline"><i>{{data_drop.resp_actor_name}}</i></button>
+        {{data_external}}
+    </form>
+    <br>
+    <form action="{% url 'app:instance_event' %}" method="post" style="display:inline;">
+        {% csrf_token %}
+        Related event:
+        <button type="submit" id="event" name="event" value="{{data_drop.event}}"
+            class="btn-link text-red-500 no-underline hover:underline"><i>{{data_drop.event}}</i></button>
+        {{data_external}}
+    </form>
+</blockquote>
+{% endfor %}
+</blockquote>
+<blockquote class="border-l-4 border-red-500 my-8 pl-8 md:pl-12">
+    <b>This document relates to the following buildings and building parts:</b>
+    <br><br>
+    <a><i><u>Sites</u></i></a>
+    <br>
+    {% for instance in bot %}
+    {% if instance.bot_type == 'Site' %}
+    <form action="{% url 'app:instance_bot' %}" method="post" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit" id="instance" name="instance" value="{{instance.bot}}"
+            class="btn-link text-red-500 no-underline hover:underline"><i>{{instance.bot_name}}</i></button>
+        <br>
+        {{data_external}}
+    </form>
+    {% endif %}
+    {% endfor %}
+    <br>
+    <a><i><u>Buildings</u></i></a>
+    <br>
+    {% for instance in bot %}
+    {% if instance.bot_type == 'Building' %}
+    <form action="{% url 'app:instance_bot' %}" method="post" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit" id="instance" name="instance" value="{{instance.bot}}"
+            class="btn-link text-red-500 no-underline hover:underline"><i>{{instance.bot_name}}</i></button>
+        <br>
+        {{data_external}}
+    </form>
+    {% endif %}
+    {% endfor %}
+    <br>
+    <a><i><u>Storeys</u></i></a>
+    <br>
+    {% for instance in bot %}
+    {% if instance.bot_type == 'Storey' %}
+    <form action="{% url 'app:instance_bot' %}" method="post" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit" id="instance" name="instance" value="{{instance.bot}}"
+            class="btn-link text-red-500 no-underline hover:underline"><i>{{instance.bot_name}}</i></button>
+        <br>
+        {{data_external}}
+    </form>
+    {% endif %}
+    {% endfor %}
+    <br>
+    <a><i><u>Spaces</u></i></a>
+    <br>
+    {% for instance in bot %}
+    {% if instance.bot_type == 'Space' %}
+    <form action="{% url 'app:instance_bot' %}" method="post" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit" id="instance" name="instance" value="{{instance.bot}}"
+            class="btn-link text-red-500 no-underline hover:underline"><i>{{instance.bot_name}}, </i></button>
+        {{data_external}}
+    </form>
+    {% endif %}
+    {% endfor %}
 
+</blockquote>
 {% endblock %}

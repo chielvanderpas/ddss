@@ -1,5 +1,6 @@
 {% extends 'auth_template.html' %}
 {% block content %}
+<div style="text-align: center;">
 <p class="py-6">You have been logged out successfully!</p>
 <br><br>
 <form>
@@ -7,4 +8,5 @@
    <input formaction="{% url 'app:login' %}" type="submit" value="Login"/>
 </form>
 <br><br><br><br>
+</div>
 {% endblock %}

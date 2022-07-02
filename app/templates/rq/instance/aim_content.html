@@ -1,74 +1,113 @@
 {% extends 'sidebar/template_navigate_aims.html' %}
 {% block content %}
-<p class="text-gray-900 text-base no-underline hover:no-underline font-extrabold text-xl" align="center"><b><u>{{aim_name}}</u></b></p>
+<p class="text-gray-900 text-base no-underline hover:no-underline font-extrabold text-xl" align="center">
+    <b><u>{{aim_name}}</u></b></p>
 <div style="text-align: center;">
-<br>
-<a style="font-size:80%;"><i>{{aim_namespace}}</i></a>
-<br><br>
-<form method="post">
-    {% csrf_token %}
-    <button style="background-color: #b20000;" formaction="app:instance_aim_content"  type="submit" id="content" name="content"><i>Sort per data type</i></button>
-    <button formaction="app:instance_aim_dd" type="submit" id="dd" name="dd"><i>Sort per data drop</i></button>
-    {{data_external}}
-</form>
+    <br>
+    <a style="font-size:80%;"><i>{{aim_namespace}}</i></a>
+    <br><br>
+    <form method="post">
+        {% csrf_token %}
+        <button style="background-color: #b20000;" formaction="{% url 'app:instance_aim_content' %}" type="submit" id="content"
+            name="content"><i>Sort per data type</i></button>
+        <button formaction="{% url 'app:instance_aim_dd' %}" type="submit" id="dd" name="dd"><i>Sort per data drop</i></button>
+        {{data_external}}
+    </form>
 </div>
 <br>
-<p class="py-3">{{welcome_message}}</p>
-<br>
+{% for site_instance in bot %}
+{% if site_instance.bot_type == 'Site' %}
 <blockquote class="border-l-4 border-red-500 my-8 pl-8 md:pl-12">
-     <b>Asset structure</b>
-     <br><br>
-     <a><i><u>Sites</u></i></a>
-     <br>
-     {% for instance in bot %}
-     {% if instance.bot_type == 'Site' %}
-     <form action="{% url 'app:instance_bot' %}" method="post" style="display:inline;">
-         {% csrf_token %}
-         <button type="submit" id="instance" name="instance" value="{{instance.bot}}" class="btn-link text-red-500 no-underline hover:underline"><i>{{instance.bot_name}}</i></button>
-         <br>
-         {{data_external}}
-     </form>
-     {% endif %}
-     {% endfor %}
-     <br>
-     <a><i><u>Buildings</u></i></a>
-     <br>
-     {% for instance in bot %}
-     {% if instance.bot_type == 'Building' %}
-     <form action="{% url 'app:instance_bot' %}" method="post" style="display:inline;">
-         {% csrf_token %}
-         <button type="submit" id="instance" name="instance" value="{{instance.bot}}" class="btn-link text-red-500 no-underline hover:underline"><i>{{instance.bot_name}}</i></button>
-         <br>
-         {{data_external}}
-     </form>
-     {% endif %}
-     {% endfor %}
-     <br>
-     <a><i><u>Storeys</u></i></a>
-     <br>
-     {% for instance in bot %}
-     {% if instance.bot_type == 'Storey' %}
-     <form action="{% url 'app:instance_bot' %}" method="post" style="display:inline;">
-         {% csrf_token %}
-         <button type="submit" id="instance" name="instance" value="{{instance.bot}}" class="btn-link text-red-500 no-underline hover:underline"><i>{{instance.bot_name}}</i></button>
-         <br>
-         {{data_external}}
-     </form>
-     {% endif %}
-     {% endfor %}
-     <br>
-     <a><i><u>Spaces</u></i></a>
-     <br>
-     {% for instance in bot %}
-     {% if instance.bot_type == 'Space' %}
-     <form action="{% url 'app:instance_bot' %}" method="post" style="display:inline;">
-         {% csrf_token %}
-         <button type="submit" id="instance" name="instance" value="{{instance.bot}}" class="btn-link text-red-500 no-underline hover:underline"><i>{{instance.bot_name}}, </i></button>
-         {{data_external}}
-     </form>
-     {% endif %}
-     {% endfor %}
-     
+    <b>Site</b>
+    <br>
+    <form action="{% url 'app:instance_bot' %}" method="post" style="display:inline;">
+        {% csrf_token %}
+        <input type="hidden" id="instance_name" name="instance_name" value="{{site_instance.bot_name}}">
+        <input type="hidden" id="instance_type" name="instance_type" value="{{site_instance.bot_type}}">
+        <button type="submit" id="instance" name="instance" value="{{site_instance.bot}}"
+            class="btn-link text-red-500 no-underline hover:underline"><i>{{site_instance.bot_name}}</i></button>
+        {{data_external}}
+    </form>
+   {% for building_instance in bot %}
+   {% for rel_instance in bot_relations %}
+   {% if rel_instance.bot_child == building_instance.bot and rel_instance.bot_parent == site_instance.bot %}
+   {% if building_instance.bot_type == 'Building' %}
+   <blockquote class="border-l-4 border-grey-500 my-8 pl-8 md:pl-12">
+    <b>Building</b>
+    <br>
+    <form action="{% url 'app:instance_bot' %}" method="post" style="display:inline;">
+        {% csrf_token %}
+        <input type="hidden" id="instance_name" name="instance_name" value="{{building_instance.bot_name}}">
+        <input type="hidden" id="instance_type" name="instance_type" value="{{building_instance.bot_type}}">
+        <button type="submit" id="instance" name="instance" value="{{building_instance.bot}}"
+            class="btn-link text-red-500 no-underline hover:underline"><i>{{building_instance.bot_name}}</i></button>
+        {{data_external}}
+    </form>
+      {% for storey_instance in bot %}
+      {% for rel_instance in bot_relations %}
+      {% if rel_instance.bot_child == storey_instance.bot and rel_instance.bot_parent == building_instance.bot %}
+      {% if storey_instance.bot_type == 'Storey' %}
+      <blockquote class="border-l-4 border-grey-500 my-8 pl-8 md:pl-12">
+        <b>Storey</b>
+        <br>
+        <form action="{% url 'app:instance_bot' %}" method="post" style="display:inline;">
+            {% csrf_token %}
+            <input type="hidden" id="instance_name" name="instance_name" value="{{storey_instance.bot_name}}">
+            <input type="hidden" id="instance_type" name="instance_type" value="{{storey_instance.bot_type}}">
+            <button type="submit" id="instance" name="instance" value="{{storey_instance.bot}}"
+                class="btn-link text-red-500 no-underline hover:underline">{{storey_instance.bot_name}}</i></button>
+            {{data_external}}
+        </form>
+        <blockquote class="border-l-4 border-grey-500 my-8 pl-8 md:pl-12">
+            <b>Spaces</b>
+            <br>
+         {% for space_instance in bot %}
+         {% for rel_instance in bot_relations %}
+         {% if rel_instance.bot_child == space_instance.bot and rel_instance.bot_parent == storey_instance.bot %}
+         {% if space_instance.bot_type == 'Space' %}
+            <form action="{% url 'app:instance_bot' %}" method="post" style="display:inline;">
+                {% csrf_token %}
+                <input type="hidden" id="instance_name" name="instance_name" value="{{space_instance.bot_name}}">
+                <input type="hidden" id="instance_type" name="instance_type" value="{{space_instance.bot_type}}">
+                <button type="submit" id="instance" name="instance" value="{{space_instance.bot}}"
+                    class="btn-link text-red-500 no-underline hover:underline"><i>{{space_instance.bot_name}}</i></button>
+                {{data_external}}
+            </form>
+            <br>
+         {% endif %}
+         {% endif %}
+         {% endfor %}
+         {% endfor %}
+        </blockquote>
+      </blockquote>
+      {% endif %}
+      {% endif %}
+      {% endfor %}
+      {% endfor %}
+   </blockquote>
+   {% endif %}
+   {% endif %}
+   {% endfor %}
+   {% endfor %}
+</blockquote>
+{% endif %}
+{% endfor %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </blockquote>
 <blockquote class="border-l-4 border-red-500 my-8 pl-8 md:pl-12">
     <b>Related events</b>
@@ -76,7 +115,8 @@
     {% for event in events %}
     <form action="{% url 'app:instance_event' %}" method="post" style="display:inline;">
         {% csrf_token %}
-        <button type="submit" id="event" name="event" value="{{event.event}}" class="btn-link text-red-500 no-underline hover:underline"><i>{{event.event_description}}</i></button>
+        <button type="submit" id="event" name="event" value="{{event.event}}"
+            class="btn-link text-red-500 no-underline hover:underline"><i>{{event.event_description}}</i></button>
         {{data_external}}
     </form>
     <br>
@@ -88,7 +128,10 @@
     {% for document in documents %}
     <form action="{% url 'app:instance_document' %}" method="post" style="display:inline;">
         {% csrf_token %}
-        <button type="submit" id="document" name="document" value="{{document.document}}" class="btn-link text-red-500 no-underline hover:underline"><i>{{document.doc_name}}</i></button>
+        <input type="hidden" id="document_name" name="document_name" value="{{document.doc_name}}">
+        <input type="hidden" id="document" name="document" value="{{document.document}}">
+        <button type="submit"
+            class="btn-link text-red-500 no-underline hover:underline"><i>{{document.doc_name}}</i></button>
         {{data_external}}
     </form>
     <br>

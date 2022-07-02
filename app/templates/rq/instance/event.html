@@ -1,28 +1,82 @@
 {% extends 'sidebar/template_navigate_aims.html' %}
 {% block content %}
-<p class="py-3">{{welcome_message}}</p>
-{% for event in output %}  
+<p class="text-gray-900 text-base no-underline hover:no-underline font-extrabold text-xl" align="center">
+    <b><u>Event</u></b>
+</p>
+<br>
+{% for event in event_data %}
 <blockquote class="border-l-4 border-red-500 my-8 pl-8 md:pl-12">
-     <b>Event</b>
-     <br>
-     Event ID: <i>{{event.id}}</i>
-     <br>
-     Event type: <i>{{event.type}}</i>
-     <br>
-     Start date & time: <i>{{event.startdatetime}}</i>
-     <br>
-     End date & time: <i>{{event.enddatetime}}</i>
-     <br>
-     Description: <i>{{event.description}}</i>
-     <br>
-     Sub events: <i>{{event.subevent}}</i>
-     <br>
-     Involved actor:
-     <form action="{% url 'app:instance_actor' %}" method="post" style="display:inline;">
-         {% csrf_token %}
-         <button type="submit" id="actor" name="actor" value="{{event.actor}}" class="btn-link text-red-500 no-underline hover:underline"><i>{{event.actor_name}}</i></button>
-         {{data_external}}
-     </form>
+    <b>Event</b>
+    <br>
+    Event ID: <i>{{event.id}}</i>
+    <br>
+    Event type: <i>{{event.type}}</i>
+    <br>
+    Start date & time: <i>{{event.startdatetime}}</i>
+    <br>
+    End date & time: <i>{{event.enddatetime}}</i>
+    <br>
+    Description: <i>{{event.description}}</i>
+    <br>
+    Involved actor:
+    <form method="post" style="display:inline;">
+        {% csrf_token %}
+        <input type="hidden" id="actor_name" name="actor_name" value="{{event.actor_name}}">
+        <input type="hidden" id="actor" name="actor" value="{{event.actor}}">
+        <button formaction="{% url 'app:instance_actor' %}" type="submit"
+            class="btn-link text-red-500 no-underline hover:underline"><i>{{event.actor_name}}</i></button>
+        {{data_external}}
+    </form>
 </blockquote>
 {% endfor %}
+<blockquote class="border-l-4 border-red-500 my-8 pl-8 md:pl-12">
+    <b>Super-events:</b>
+    {% for superevent in superevents %}
+    <br>
+    <form method="post" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit" id="event" name="event" value="{{superevent.superevent}}"
+            class="btn-link text-red-500 no-underline hover:underline"><i>{{superevent.superevent_type}} |
+                {{superevent.superevent_startdatetime}} | {{superevent.superevent_description}} | id:
+                {{superevent.superevent}}</i></button>
+        {{data_external}}
+    </form>
+    {% endfor %}
+</blockquote>
+<blockquote class="border-l-4 border-red-500 my-8 pl-8 md:pl-12">
+    <b>Sub-events:</b>
+    {% for subevent in subevents %}
+    <br>
+    <form method="post" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit" id="event" name="event" value="{{subevent.subevent}}"
+            class="btn-link text-red-500 no-underline hover:underline"><i>{{subevent.subevent_type}} |
+                {{subevent.subevent_startdatetime}} | {{subevent.subevent_description}} | id:
+                {{subevent.subevent}}</i></button>
+        {{data_external}}
+    </form>
+    {% endfor %}
+</blockquote>
+<blockquote class="border-l-4 border-red-500 my-8 pl-8 md:pl-12">
+    <b>Related data drops:</b>
+    {% for data_drop in data_drops %}
+    <br>
+    <form action="{% url 'app:instance_datadrop' %}" method="post" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit" id="data_drop" name="data_drop" value="{{data_drop.data_drop}}"
+            class="btn-link text-red-500 no-underline hover:underline"><i>{{data_drop.data_drop}}</i></button>
+        {{data_external}}
+        <br>
+        Uploaded on: <i>{{data_drop.datetime}}</i>
+        <br>
+        Uploaded by:
+        <input type="hidden" id="actor_name" name="actor_name" value="{{data_drop.upload_actor_name}}">
+        <input type="hidden" id="actor" name="actor" value="{{data_drop.upload_actor}}">
+        <button formaction="{% url 'app:instance_actor' %}" type="submit"
+            class="btn-link text-red-500 no-underline hover:underline"><i>{{data_drop.upload_actor_name}}</i></button>
+        {{data_external}}
+        <br>
+    </form>
+    {% endfor %}
+</blockquote>
 {% endblock %}
