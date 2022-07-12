@@ -34,6 +34,7 @@ urlpatterns = [
     path('instance/event/', views.instance_event, name='instance_event'),
     path('instance/document/', views.instance_document, name='instance_document'),
     path('instance/document/download/', views.instance_document_download, name='instance_document_download'),
+    path('instance/document/download/2/<str:file_path>', views.instance_document_download2, name='instance_document_download2'),
     path('instance/actor/', views.instance_actor, name='instance_actor'),
     path('instance/building/', views.instance_bot, name='instance_bot'),
     path('instance/datadrop/', views.instance_datadrop, name='instance_datadrop'),
@@ -61,6 +62,7 @@ urlpatterns = [
     path('dd/upload_file/5/', views.dd_upload_file_5, name='dd_upload_file_5'),
     path('dd/end/', views.dd_end, name='dd_end'),
     ############################
+    path('ifc_viewer/', views.ifc_viewer, name='ifc_viewer'),
 ]
 
 if settings.DEBUG:

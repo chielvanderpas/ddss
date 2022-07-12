@@ -70,7 +70,7 @@ nss_foaf = 'foaf: <http://xmlns.com/foaf/0.1/>'
 #######################################
 
 ns_oms = Namespace(o_oms)
-nss_oms = str('oms: <'+o_oms+'#>')
+nss_oms = str('oms: <'+o_oms+'>')
 
 ####################
 ### Setup models ###
@@ -407,7 +407,7 @@ def rq_aim_bot(aim_namespace):
             bot:Element
         }
         ?bot ddss:partOf ?aim .
-        ?bot ddss:hasName ?bot_name .
+        ?bot ddss:hasBotName ?bot_name .
     }
     """
     result = input.query(q)
@@ -533,7 +533,7 @@ def rq_aim_events(aim_namespace):
         } 
         ?event ddss:partOf ?aim .
         ?event ddss:startedAt ?event_startdatetime .
-        ?event ddss:hasDescription ?event_description .
+        ?event ddss:hasEventDescription ?event_description .
     }
     """
     result = input.query(q)
@@ -632,7 +632,7 @@ def rq_aim_datadrops3(aim_namespace):
         ?data_drop ddss:relatesToEvent ?event .
         ?event rdf:type ?event_type .
         ?event ddss:startedAt ?event_datetime .
-        ?event ddss:hasDescription ?event_description .
+        ?event ddss:hasEventDescription ?event_description .
     }
     """
     result = input.query(q)
@@ -676,7 +676,7 @@ def rq_event1(aim_namespace, instance):
             ddss:Acquire
         } 
         ?event ddss:startedAt ?startdatetime .
-        ?event ddss:hasDescription ?description .
+        ?event ddss:hasEventDescription ?description .
         OPTIONAL {
             ?event ddss:endedAt ?enddatetime .
         }
@@ -727,7 +727,7 @@ def rq_event4(aim_namespace, instance):
         ?superevent ddss:hasSubEvent ?event .
         ?superevent rdf:type ?superevent_type .
         ?superevent ddss:startedAt ?superevent_startdatetime .
-        ?superevent ddss:hasDescription ?superevent_description .
+        ?superevent ddss:hasEventDescription ?superevent_description .
     }
     """
     result = input.query(q)
@@ -771,7 +771,7 @@ def rq_event5(aim_namespace, instance):
         ?event ddss:hasSubEvent ?subevent .
         ?subevent rdf:type ?subevent_type .
         ?subevent ddss:startedAt ?subevent_startdatetime .
-        ?subevent ddss:hasDescription ?subevent_description .
+        ?subevent ddss:hasEventDescription ?subevent_description .
     }
     """
     result = input.query(q)
@@ -862,13 +862,13 @@ def rq_bot1(aim_namespace, instance):
             ?bot ddss:hasGuid ?guid .
             }
         OPTIONAL {
-            ?bot ddss:hasName ?name .
+            ?bot ddss:hasBotName ?name .
             }
         OPTIONAL {
-            ?bot ddss:hasLongName ?longname .
+            ?bot ddss:hasBotLongName ?longname .
             }
         OPTIONAL {
-            ?bot ddss:hasDescription ?description .
+            ?bot ddss:hasBotDescription ?description .
             }
         ?bot ddss:partOf ?aim .
         ?aim ddss:hasModelName ?aim_name .
@@ -905,7 +905,7 @@ def rq_bot2(aim_namespace, instance):
         VALUES ?bot {
             aim:"""+instance+"""
         }
-        ?document ddss:relatesToBuilding ?bot .
+        ?document ddss:relatesToPhysicalObject ?bot .
         ?document ddss:hasFileName ?document_name .
     }
     """
@@ -952,10 +952,10 @@ def rq_bot3(aim_namespace, instance):
             bot:Element
         }
         OPTIONAL {
-            ?parent ddss:hasName ?parent_name .
+            ?parent ddss:hasBotName ?parent_name .
         }
         OPTIONAL {
-            ?child ddss:hasName ?child_name .
+            ?child ddss:hasBotName ?child_name .
         }
     }
     """
@@ -1005,10 +1005,10 @@ def rq_bot4(aim_namespace, instance):
             bot:Element
         }
         OPTIONAL {
-            ?parent ddss:hasName ?parent_name .
+            ?parent ddss:hasBotName ?parent_name .
         }
         OPTIONAL {
-            ?child ddss:hasName ?child_name .
+            ?child ddss:hasBotName ?child_name .
         }
     }
     """
@@ -1078,6 +1078,7 @@ def rq_actor2(aim_namespace, instance):
         ?data_drop ddss:uploadedBy ?upload_actor .
         ?upload_actor ddss:hasName ?upload_actor_name .
         ?data_drop ddss:occurredAt ?datetime .
+        ?data_drop ddss:partOf <"""+aim_namespace+"""> .
     }
     """
     result = input.query(q)
@@ -1161,12 +1162,12 @@ def rq_document1(aim_namespace, instance):
         OPTIONAL {
             ?document ddss:hasUniqueIdentifier ?unique_identifier .
         }
-        ?document ddss:hasDescription ?description .
+        ?document ddss:hasDocumentDescription ?description .
         ?document ddss:hasFileName ?file_name .
         OPTIONAL {
             ?document ddss:hasCopy ?copy .
-            ?copy ddss:hasFileName ?copy_name .
-            ?copy ddss:locatedAt ?copy_storage_location .
+            ?copy ddss:hasCopyFileName ?copy_name .
+            ?copy ddss:copyStoredAt ?copy_storage_location .
         }
         ?document ddss:hasCreationSoftware ?creation_software .
         ?document ddss:hasCreationSoftwareVersion ?creation_software_version .
@@ -1175,7 +1176,7 @@ def rq_document1(aim_namespace, instance):
         }
         ?document ddss:partOf ?aim .
         ?aim ddss:hasModelName ?aim_name .
-        ?document ddss:locatedAt ?storage_location .
+        ?document ddss:storedAt ?storage_location .
     }
     """
     result = input.query(q)
@@ -1436,8 +1437,13 @@ def rq_document8(aim_namespace, instance):
             bot:Space
             bot:Element
         }
-        ?document ddss:relatesToBuilding ?bot .
-        ?bot ddss:hasName ?bot_name .
+        OPTIONAL {
+        ?document ddss:relatesToZone ?bot .
+        }
+        OPTIONAL {
+        ?document ddss:relatesToZone ?bot .
+        }
+        ?bot ddss:hasBotName ?bot_name .
     }
     """
     result = input.query(q)
@@ -1537,7 +1543,7 @@ def rq_datadrop3(aim_namespace, instance):
         ?data_drop ddss:relatesToEvent ?event .
         ?event rdf:type ?event_type .
         ?event ddss:startedAt ?event_datetime .
-        ?event ddss:hasDescription ?event_description .
+        ?event ddss:hasEventDescription ?event_description .
     }
     """
     result = input.query(q)
@@ -1627,16 +1633,17 @@ def rq_index_dd():
     LIMIT 5
     """
     result = input.query(q)
-    namedlist = collections.namedtuple('namedlist', ['aim', 'aim_name', 'data_drop', 'upload_actor', 'upload_actor_name', 'datetime'])
+    namedlist = collections.namedtuple('namedlist', ['aim', 'aim_name', 'data_drop', 'data_drop_rev', 'upload_actor', 'upload_actor_name', 'datetime'])
     output = []
     for row in result:
         aim = row.aim.replace('', '')
         aim_name = row.aim_name.replace('', '')
         data_drop = row.data_drop.replace('', '')
+        data_drop_rev = data_drop.rsplit('#', 1)[1]
         upload_actor = row.upload_actor.replace(o_oms, '')
         upload_actor_name = row.upload_actor_name.replace('', '')
         datetime = row.datetime.replace('', '')
-        output.append(namedlist(aim, aim_name, data_drop, upload_actor, upload_actor_name, datetime))
+        output.append(namedlist(aim, aim_name, data_drop, data_drop_rev, upload_actor, upload_actor_name, datetime))
     return output
 
 ### data request models: current aim ###
@@ -1713,7 +1720,6 @@ def rq_aim():
 ### Data drop: create new AIM ###
 
 def dd_new_aim(aim_name):
-    aim_default_namespace
     unique_aim_id = BNode()
     hashtag = '#'
     aim_namespace = aim_default_namespace+unique_aim_id+hashtag
@@ -1804,7 +1810,7 @@ def rq_event2(o_aim):
             ddss:Acquire
         } 
         ?event ddss:startedAt ?startdatetime .
-        ?event ddss:hasDescription ?description .
+        ?event ddss:hasEventDescription ?description .
     }
     """
     result = input.query(q)
@@ -1825,7 +1831,7 @@ def dd_event1(o_aim, event_type, event_description, startdatetime, enddatetime, 
     predicate1 = 'type'
     p1 = URIRef(ns_rdf+predicate1)
     o1 = URIRef(ns_ddss+event_type)
-    predicate2 = 'hasDescription'
+    predicate2 = 'hasEventDescription'
     p2 = URIRef(ns_ddss+predicate2)
     o2 = Literal(event_description)
     predicate3 = 'startedAt'
@@ -1931,7 +1937,7 @@ def dd_prev_version_check(file_exists_check, o_aim):
         VALUES ?filename {
             """+prev_version_rev+"""
         }
-        ?document ddss:locatedAt ?location .
+        ?document ddss:storedAt ?location .
         VALUES ?location {
             """+prev_location_rev+"""
         }
@@ -1982,7 +1988,7 @@ def dd_document1(o_aim, file_name, file_type, file_location, copy_name, copy_typ
     predicate2 = 'hasFileName'
     p2 = URIRef(ns_ddss+predicate2)
     o2 = Literal(file_name)
-    predicate3 = 'locatedAt'
+    predicate3 = 'storedAt'
     p3 = URIRef(ns_ddss+predicate3)
     o3 = Literal(file_location)
     predicate4 = 'partOf'
@@ -2014,11 +2020,11 @@ def dd_document1(o_aim, file_name, file_type, file_location, copy_name, copy_typ
         s6 = URIRef(ns_aim+unique_copy_id)
         p6 = URIRef(ns_ddss+predicate6)
         o6 = Literal(copy_type)
-        predicate7 = 'hasFileName'
+        predicate7 = 'hasCopyFileName'
         s7 = URIRef(ns_aim+unique_copy_id)
         p7 = URIRef(ns_ddss+predicate7)
         o7 = Literal(copy_name)
-        predicate8 = 'locatedAt'
+        predicate8 = 'copyStoredAt'
         s8 = URIRef(ns_aim+unique_copy_id)
         p8 = URIRef(ns_ddss+predicate8)
         o8 = Literal(copy_location)
@@ -2063,7 +2069,7 @@ def dd_document1(o_aim, file_name, file_type, file_location, copy_name, copy_typ
 def dd_document2(o_aim, unique_dd_id, unique_document_id, document_description, document_unique_identifier, document_creation_software, document_creation_software_version, preservation_until_date, content_type_documentation, content_type_geometrical, content_type_alphanumerical, document_status, prev_version_id, prev_version_status, responsible_actor):
     ns_aim = Namespace(o_aim)
     s = URIRef(ns_aim+unique_document_id)
-    predicate1 = 'hasDescription'
+    predicate1 = 'hasDocumentDescription'
     p1 = URIRef(ns_ddss+predicate1)
     o1 = Literal(document_description)
     predicate2 = 'hasUniqueIdentifier'
@@ -2209,6 +2215,7 @@ def dd_ifc1_append_instance(element, namedlist1, model_data, namedlist2, relatio
 
 def dd_ifc1b(o_aim, model_data):
     nss_aim = str('aim: <'+o_aim+'>')
+    aim_rev = str(f"<{o_aim}>")
     input = sparqlstore.SPARQLUpdateStore()
     input.open((sparql_endpoint_1))
     q = """
@@ -2229,17 +2236,21 @@ def dd_ifc1b(o_aim, model_data):
             bot:Space
             bot:Element
             }
+        ?bot ddss:partOf ?aim .
+        VALUES ?aim {
+            """+aim_rev+"""
+        }
         OPTIONAL {
             ?bot ddss:hasGuid ?guid .
             }
         OPTIONAL {
-            ?bot ddss:hasName ?name .
+            ?bot ddss:hasBotName ?name .
             }
         OPTIONAL {
-            ?bot ddss:hasLongName ?longname .
+            ?bot ddss:hasBotLongName ?longname .
             }
         OPTIONAL {
-            ?bot ddss:hasDescription ?description .
+            ?bot ddss:hasBotDescription ?description .
             }
     }
     """
@@ -2325,16 +2336,16 @@ def dd_ifc2(o_aim, unique_document_id, model_data, intersections):
             predicate2 = 'hasGuid'
             p2 = URIRef(ns_ddss+predicate2)
             o2 = Literal(guid)
-            predicate3 = 'hasName'
+            predicate3 = 'hasBotName'
             p3 = URIRef(ns_ddss+predicate3)
             o3 = Literal(name)
-            predicate4 = 'hasLongName'
+            predicate4 = 'hasBotLongName'
             p4 = URIRef(ns_ddss+predicate4)
             o4 = Literal(longname)
-            predicate5 = 'hasDescription'
+            predicate5 = 'hasBotDescription'
             p5 = URIRef(ns_ddss+predicate5)
             o5 = Literal(description)
-            predicate6 = 'relatesToBuilding'
+            predicate6 = 'relatesToPhysicalObject'
             s6 = URIRef(ns_aim+unique_document_id)
             p6 = URIRef(ns_ddss+predicate6)
             o6 = s

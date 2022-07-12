@@ -39,9 +39,9 @@
    <b>Most recent data drops</b>
    <br>
    {% for data_drop in data_drops %}
-   <form action="{% url 'app:instance_aim_content' %}" method="post" style="display:inline;">
+   <form action="{% url 'app:instance_datadrop' %}" method="post" style="display:inline;">
       {% csrf_token %}
-      <input type="hidden" id="data_drop" name="data_drop" value="{{datadrop.data_drop}}">
+      <input type="hidden" id="data_drop" name="data_drop" value="{{data_drop.data_drop_rev}}">
       <input type="hidden" id="aim_namespace" name="aim_namespace" value="{{aim.namespace}}">
       <button type="submit" class="btn-link text-red-500 no-underline hover:underline">{{data_drop.aim_name}} | {{data_drop.datetime}}</button>
       {{data_external}}

@@ -233,6 +233,14 @@ def instance_document_download(request):
             return response
 
 @login_required
+def instance_document_download2(request, file_path):
+    if os.path.exists(file_path):
+        with open(file_path, 'rb') as fh:
+            response = HttpResponse(fh.read(), content_type="application/vnd.ms-excel")
+            response['Content-Disposition'] = 'inline; filename=' + os.path.basename(file_path)
+            return response
+
+@login_required
 def instance_actor(request):
     first_name = request.user.get_short_name()
     aim_namespace = request.session.get('aim_namespace')
@@ -365,21 +373,13 @@ def dd_create_new_aim_2(request):
     aim_name = request.POST.get('aim_name')
     o_aim = models.dd_new_aim(aim_name)
     request.session['o_aim'] = o_aim
-    new_dd = request.session.get('new_dd', None)
-    if new_dd == True:
-        user_id = request.session.get('unique_user_id', None)
-        unique_dd_id = models.dd_create(o_aim, user_id)
-        request.session['unique_dd_id'] = unique_dd_id
-        request.session['current_dd_start_time'] = datetime.now().strftime("%Y-%m-%dT%H:%M")
-    else:
-        unique_dd_id = request.session.get('unique_dd_id', None)
-    existing_events_check = models.rq_event2(o_aim)
-    if existing_events_check == []:
-        disabled = 'disabled'
-    else:
-        disabled = ''
-    visibility_status = 'hidden'
-    return render(request, 'dd/dd_select_event.html', {'first_name':first_name, 'aim_name':aim_name, 'output':unique_dd_id, 'disabled':disabled, 'visibility_status':visibility_status})
+    user_id = request.session.get('unique_user_id', None)
+    unique_dd_id = models.dd_create(o_aim, user_id)
+    request.session['unique_dd_id'] = unique_dd_id
+    request.session['current_dd_start_time'] = datetime.now().strftime("%Y-%m-%dT%H:%M")
+    existing_events = models.rq_event2(o_aim)
+    existing_actors = models.rq_actor3()
+    return render(request, 'dd/dd_create_new_event.html', {'first_name':first_name, 'aim_name':aim_name, 'existing_events':existing_events, 'existing_actors':existing_actors})
 
 @login_required
 def dd_select_existing_event_1(request):
@@ -582,7 +582,8 @@ def dd_end(request):
     request.session['current_dd_start_time'] = None
     return redirect('app:index')
 
-
+def ifc_viewer(request):
+    return render(request, 'ifc_viewer.html')
 
 
 
