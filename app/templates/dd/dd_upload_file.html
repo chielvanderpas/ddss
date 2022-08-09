@@ -1,5 +1,10 @@
 {% extends 'sidebar/template_add_data.html' %}
 {% block content %}
+{% if unique_dd_id == None %}
+<script>
+    window.location.href="{% url 'app:dd_end_2' %}"
+</script>
+{% else %}
 <p class="text-gray-900 text-base no-underline hover:no-underline font-extrabold text-xl" align="center"><b><u>Upload file</u></b></p>
 <div style="text-align: center;">
 <br>
@@ -17,10 +22,17 @@
     <input type="file" id="copy_in_original_format" name="copy_in_original_format">
     {{data_external}}
     <br><br><br>
+    <div style="display: flex; align-items: center; justify-content: center;">
     <input formaction="{% url 'app:dd_upload_file_2' %}" type="submit" value="Upload"/>
 </form>
+&nbsp;
+<form>
+    <input formaction="{% url 'app:dd_select_event' %}" type="submit" value="Or skip this step"/>
+</form>
+</div>
 <br><br><br>
 <b><i>{{error_message}}</i></b>
 <br><br>
 </div>
+{% endif %}
 {% endblock %}

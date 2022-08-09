@@ -12,9 +12,14 @@
          <input size="30" type="password" id="password" name="password" required align="left"><br><br>
          {{data_external}}
          <br>
+         <div style="display: flex; align-items: center; justify-content: center;">
          <input formaction="{% url 'app:login_proceed' %}" type="submit" value="Login">
+         </form>
          &nbsp;
+         <form>
          <input formaction="{% url 'app:register' %}" type="submit" value="Register"/>
+        </form>
+        </div>
          </fieldset>
        </form>
        <br><br><br><br>

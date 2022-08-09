@@ -1,5 +1,10 @@
 {% extends 'sidebar/template_add_data.html' %}
 {% block content %}
+{% if unique_dd_id == None %}
+<script>
+    window.location.href="{% url 'app:dd_end_2' %}"
+</script>
+{% else %}
 <p class="text-gray-900 text-base no-underline hover:no-underline font-extrabold text-xl" align="center"><b><u>Upload file</u></b></p>
 <div style="text-align: center;">
 <br>
@@ -48,7 +53,7 @@
     {{data_external}}
     <br><br>
     <label for="document_unique_identifier">Optional unique document identifier:</label>
-    <input size="40" type="text" id="document_unique_identifier" name="document_unique_identifier" autofocus align=""left>
+    <input size="40" type="text" id="document_unique_identifier" name="document_unique_identifier" autofocus align="left">
     {{data_external}}
     <br><br>
     <label for="document_creation_software">Creation software:</label>
@@ -119,4 +124,5 @@
     <input formaction="{% url 'app:dd_upload_file_3' %}" type="submit" value="Continue">
 </form>
 </div>
+{% endif %}
 {% endblock %}

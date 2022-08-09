@@ -1,0 +1,12 @@
+{% extends 'sidebar/template_fork.html' %}
+{% block content %}
+<p class="text-gray-900 text-base no-underline hover:no-underline font-extrabold text-xl" align="center"><b><u>Import or export an AIM fork</u></b></p>
+<br><br><br><br><br><br>
+<div style="text-align: center;">
+<form>
+    <input formaction="{% url 'app:fork_export_1' %}" type="submit" value="Export an AIM"/>
+    <input formaction="{% url 'app:fork_import_1' %}" type="submit" value="Import an AIM"/>
+</form>
+</div>
+{{output}}
+{% endblock %}

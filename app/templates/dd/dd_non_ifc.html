@@ -1,0 +1,81 @@
+{% extends 'sidebar/template_add_data.html' %}
+{% block content %}
+{% if unique_dd_id == None %}
+<script>
+    window.location.href="{% url 'app:dd_end_2' %}"
+</script>
+{% else %}
+<p class="text-gray-900 text-base no-underline hover:no-underline font-extrabold text-xl" align="center"><b><u>Extract
+         building data</u></b></p>
+<br>
+<p class="py-6">Below, you can find all site-, building-, storey-, and space instances in this AIM. Please select the instances to which this document relates.</p>
+<br>
+<form method="post">
+{% csrf_token %}
+{% for site_instance in bot %}
+{% if site_instance.bot_type == 'Site' %}
+<blockquote class="border-l-4 border-red-500 my-8 pl-8 md:pl-12">
+    <b>Site</b>
+    <br>
+    <input type="checkbox" name="relation" id="relation-{{ forloop.counter }}" value="{{site_instance.bot}}">
+    {{data_external}}
+    {{site_instance.bot_name}}
+   {% for building_instance in bot %}
+   {% for rel_instance in bot_relations %}
+   {% if rel_instance.bot_child == building_instance.bot and rel_instance.bot_parent == site_instance.bot %}
+   {% if building_instance.bot_type == 'Building' %}
+   <blockquote class="border-l-4 border-grey-500 my-8 pl-8 md:pl-12">
+    <b>Building</b>
+    <br>
+    <input type="checkbox" name="relation" id="relation-{{ forloop.counter }}" value="{{building_instance.bot}}">
+    {{data_external}}
+    {{building_instance.bot_name}}
+      {% for storey_instance in bot %}
+      {% for rel_instance in bot_relations %}
+      {% if rel_instance.bot_child == storey_instance.bot and rel_instance.bot_parent == building_instance.bot %}
+      {% if storey_instance.bot_type == 'Storey' %}
+      <blockquote class="border-l-4 border-grey-500 my-8 pl-8 md:pl-12">
+        <b>Storey</b>
+        <br>
+        <input type="checkbox" name="relation" id="relation-{{ forloop.counter }}" value="{{storey_instance.bot}}">
+        {{data_external}}
+        {{storey_instance.bot_name}}
+        <blockquote class="border-l-4 border-grey-500 my-8 pl-8 md:pl-12">
+            <b>Spaces</b>
+            <br>
+         {% for space_instance in bot %}
+         {% for rel_instance in bot_relations %}
+         {% if rel_instance.bot_child == space_instance.bot and rel_instance.bot_parent == storey_instance.bot %}
+         {% if space_instance.bot_type == 'Space' %}
+         <input type="checkbox" name="relation" id="relation-{{ forloop.counter }}" value="{{space_instance.bot}}">
+         {{data_external}}
+         {{space_instance.bot_name}}
+            <br>
+         {% endif %}
+         {% endif %}
+         {% endfor %}
+         {% endfor %}
+        </blockquote>
+      </blockquote>
+      {% endif %}
+      {% endif %}
+      {% endfor %}
+      {% endfor %}
+   </blockquote>
+   {% endif %}
+   {% endif %}
+   {% endfor %}
+   {% endfor %}
+</blockquote>
+{% endif %}
+{% endfor %}
+</blockquote>
+<div style="text-align: center;">
+   <br>
+<br>
+<br>
+<input formaction="{% url 'app:dd_upload_file_6' %}" type="submit" value="Continue" />
+</div>
+</form>
+{% endif %}
+{% endblock %}

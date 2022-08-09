@@ -1,11 +1,14 @@
 from hashlib import sha3_224
 from pickle import TRUE
 from re import X
+from turtle import Turtle
+from xml.dom.expatbuilder import Namespaces
 from xml.dom.minidom import Document
 from django.forms import DateTimeField
+from django.http import HttpResponse
 from pyparsing import punc8bit
 from rdflib import Graph, URIRef, BNode, Literal, Namespace, Dataset
-from rdflib.namespace import RDFS, XSD, FOAF, OWL, RDF
+from rdflib.namespace import RDFS, XSD, FOAF, OWL, RDF, NamespaceManager
 from rdflib.plugins.stores import sparqlstore
 from SPARQLWrapper import SPARQLWrapper, SPARQLWrapper2, XML, TURTLE, JSON
 from django.db import models
@@ -14,7 +17,8 @@ from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.conf import settings
 from datetime import datetime
 from django.core.files.storage import FileSystemStorage
-import string, random, collections
+from django.core.files import File
+import string, random, collections, os, zipfile, sys, fileinput, shutil
 import ifcopenshell
 
 # g.add_graph
@@ -33,6 +37,7 @@ import ifcopenshell
 sparql_endpoint_1 = settings.SPARQL_ENDPOINT_1
 sparql_endpoint_2 = settings.SPARQL_ENDPOINT_2
 document_storage_location = settings.MEDIA_ROOT
+document_storage_location_rel = settings.MEDIA_ROOT_REL
 aim_default_namespace = settings.AIM_DEFAULT_NAMESPACE
 o_oms = settings.ORGANIZATION_DEFAULT_NAMESPACE
 current_org = settings.CURRENT_ORG
@@ -567,7 +572,7 @@ def rq_aim_datadrops1(aim_namespace):
             """+aim_rev+"""
         }
         ?aim ddss:hasModelName ?aim_name .
-        ?data_drop ddss:partOf ?aim .
+        ?data_drop ddss:ddPartOf ?aim .
         ?data_drop ddss:uploadedBy ?upload_actor .
         ?upload_actor ddss:hasName ?upload_actor_name .
         ?data_drop ddss:occurredAt ?datetime .
@@ -696,6 +701,44 @@ def rq_event1(aim_namespace, instance):
         actor = row.actor.replace(o_oms, '')
         actor_name = row.actor_name
         output.append(namedlist(id, type, startdatetime, enddatetime, description, actor, actor_name))
+    return output
+
+def rq_event3(aim_namespace, instance):
+    nss_aim = str('aim: <'+aim_namespace+'>')
+    input = sparqlstore.SPARQLUpdateStore()
+    input.open((sparql_endpoint_1))
+    q = """
+    PREFIX """+nss_bot+"""
+    PREFIX """+nss_ddss+"""
+    PREFIX """+nss_rdf+"""
+    PREFIX """+nss_oms+"""
+    PREFIX """+nss_aim+"""
+    SELECT ?event ?bot ?bot_type ?bot_name
+    WHERE {
+        VALUES ?event {
+            aim:"""+instance+"""
+        }
+        ?bot rdf:type ?bot_type .
+        VALUES ?bot_type {
+            bot:Site
+            bot:Building
+            bot:Storey
+            bot:Space
+            bot:Element
+        }
+        ?event ddss:relatesToPhysicalObject ?bot .
+        ?bot ddss:hasBotName ?bot_name .
+    }
+    """
+    result = input.query(q)
+    namedlist = collections.namedtuple('namedlist', ['event', 'bot', 'bot_type', 'bot_name'])
+    output = []
+    for row in result:
+        event = row.event.replace('', '')
+        bot = row.bot.replace(aim_namespace, '')
+        bot_type = row.bot_type.replace(o_bot, '')
+        bot_name = row.bot_name.replace(aim_namespace, '')
+        output.append(namedlist(event, bot, bot_type, bot_name))
     return output
 
 def rq_event4(aim_namespace, instance):
@@ -1025,6 +1068,35 @@ def rq_bot4(aim_namespace, instance):
         output.append(namedlist(parent, parent_name, parent_type, child, child_name, child_type))
     return output
 
+def rq_bot5(aim_namespace, instance):
+    nss_aim = str('aim: <'+aim_namespace+'>')
+    input = sparqlstore.SPARQLUpdateStore()
+    input.open((sparql_endpoint_1))
+    q = """
+    PREFIX """+nss_bot+"""
+    PREFIX """+nss_ddss+"""
+    PREFIX """+nss_rdf+"""
+    PREFIX """+nss_oms+"""
+    PREFIX """+nss_aim+"""
+    SELECT ?bot ?event ?event_description
+    WHERE {
+        VALUES ?bot {
+            aim:"""+instance+"""
+        }
+        ?event ddss:relatesToPhysicalObject ?bot .
+        ?event ddss:hasEventDescription ?event_description .
+    }
+    """
+    result = input.query(q)
+    namedlist = collections.namedtuple('namedlist', ['bot', 'event', 'event_description'])
+    output = []
+    for row in result:
+        bot = row.bot.replace(aim_namespace, '')
+        event = row.event.replace(aim_namespace, '')
+        event_description = row.event_description.replace('', '')
+        output.append(namedlist(bot, event, event_description))
+    return output
+
 ### data request models: actor instance models ###
 
 def rq_actor1(aim_namespace, instance):
@@ -1078,7 +1150,7 @@ def rq_actor2(aim_namespace, instance):
         ?data_drop ddss:uploadedBy ?upload_actor .
         ?upload_actor ddss:hasName ?upload_actor_name .
         ?data_drop ddss:occurredAt ?datetime .
-        ?data_drop ddss:partOf <"""+aim_namespace+"""> .
+        ?data_drop ddss:ddPartOf <"""+aim_namespace+"""> .
     }
     """
     result = input.query(q)
@@ -1343,36 +1415,31 @@ def rq_document6(aim_namespace, instance):
     PREFIX """+nss_rdf+"""
     PREFIX """+nss_oms+"""
     PREFIX """+nss_aim+"""
-    SELECT ?document ?document_interaction ?data_drop ?datetime ?resp_actor ?resp_actor_name ?upload_actor ?upload_actor_name ?event
+    SELECT ?document ?data_drop ?datetime ?upload_actor ?upload_actor_name (GROUP_CONCAT(DISTINCT ?document_interaction; SEPARATOR=", ") AS ?document_interactions) (GROUP_CONCAT(DISTINCT ?document_interaction_type; SEPARATOR=", ") AS ?document_interaction_types)
     WHERE {
-        ?document rdf:type ?doc_type .
-        VALUES ?document {
-            aim:"""+instance+"""
-        }
-        ?document_interaction ddss:concernsDocument ?document .
-        ?data_drop ddss:contains ?document_interaction .
-        ?data_drop ddss:occurredAt ?datetime .
-        ?document_interaction ddss:hasResponsibleActor ?resp_actor .
-        ?resp_actor ddss:hasName ?resp_actor_name .
-        ?data_drop ddss:uploadedBy ?upload_actor .
-        ?upload_actor ddss:hasName ?upload_actor_name .
-        ?data_drop ddss:relatesToEvent ?event .
-    }
+            VALUES ?document {
+                aim:"""+instance+"""
+            }
+            ?document_interaction ddss:concernsDocument ?document .
+    		?document_interaction rdf:type ?document_interaction_type .
+            ?data_drop ddss:contains ?document_interaction .
+            ?data_drop ddss:occurredAt ?datetime .
+            ?data_drop ddss:uploadedBy ?upload_actor .
+    		?upload_actor ddss:hasName ?upload_actor_name . }
+    GROUP BY ?document ?data_drop ?datetime ?upload_actor ?upload_actor_name
+
     """
     result = input.query(q)
-    namedlist = collections.namedtuple('namedlist', ['document', 'document_interaction', 'data_drop', 'datetime', 'resp_actor', 'resp_actor_name', 'upload_actor', 'upload_actor_name', 'event'])
+    namedlist = collections.namedtuple('namedlist', ['document', 'data_drop', 'datetime', 'upload_actor', 'upload_actor_name', 'document_interaction_types',])
     output = []
     for row in result:
         document = row.document.replace('', '')
-        document_interaction = row.document_interaction.replace(aim_namespace, '')
         data_drop = row.data_drop.replace(aim_namespace, '')
         datetime = row.datetime.replace('', '')
-        resp_actor = row.resp_actor.replace(o_oms, '')
-        resp_actor_name = row.resp_actor_name.replace('', '')
         upload_actor = row.upload_actor.replace(o_oms, '')
         upload_actor_name = row.upload_actor_name.replace('', '')
-        event = row.event.replace(aim_namespace, '')
-        output.append(namedlist(document, document_interaction, data_drop, datetime, resp_actor, resp_actor_name, upload_actor, upload_actor_name, event))
+        document_interaction_types = row.document_interaction_types.replace(aim_namespace, '')
+        output.append(namedlist(document, data_drop, datetime, upload_actor, upload_actor_name, document_interaction_types))
     return output
 
 def rq_document7(aim_namespace, instance):
@@ -1385,7 +1452,7 @@ def rq_document7(aim_namespace, instance):
     PREFIX """+nss_rdf+"""
     PREFIX """+nss_oms+"""
     PREFIX """+nss_aim+"""
-    SELECT ?document_interaction_type
+    SELECT ?document_interaction_type ?resp_actor ?resp_actor_name
     WHERE {
         ?document rdf:type ?doc_type .
         VALUES ?document {
@@ -1393,13 +1460,18 @@ def rq_document7(aim_namespace, instance):
         }
         ?document_interaction ddss:concernsDocument ?document .
         ?document_interaction rdf:type ?document_interaction_type .
+        ?document_interaction ddss:hasResponsibleActor ?resp_actor .
+        ?resp_actor ddss:hasName ?resp_actor_name .
     }
     """
     result = input.query(q)
+    namedlist = collections.namedtuple('namedlist', ['document_interaction_type', 'resp_actor', 'resp_actor_name',])
     output = []
     for row in result:
         document_interaction_type = row.document_interaction_type.replace(o_ddss, '')
-        output.append(document_interaction_type)
+        resp_actor = row.resp_actor.replace(o_oms, '')
+        resp_actor_name = row.resp_actor_name.replace('', '')
+        output.append(namedlist(document_interaction_type, resp_actor, resp_actor_name))
     return output
 
 def rq_document8(aim_namespace, instance):
@@ -1437,12 +1509,7 @@ def rq_document8(aim_namespace, instance):
             bot:Space
             bot:Element
         }
-        OPTIONAL {
-        ?document ddss:relatesToZone ?bot .
-        }
-        OPTIONAL {
-        ?document ddss:relatesToZone ?bot .
-        }
+        ?document ddss:relatesToPhysicalObject ?bot .
         ?bot ddss:hasBotName ?bot_name .
     }
     """
@@ -1594,7 +1661,7 @@ def rq_index_aim():
         ?aim rdf:type ddss:AIM .
     	?aim ddss:hasModelName ?aim_name .
         ?data_drop rdf:type ddss:DataDrop .
-        ?data_drop ddss:partOf ?aim .
+        ?data_drop ddss:ddPartOf ?aim .
         ?data_drop ddss:occurredAt ?datetime .
         }
     ORDER BY DESC(?datetime)
@@ -1623,7 +1690,7 @@ def rq_index_dd():
     SELECT ?aim ?aim_name ?data_drop ?upload_actor ?upload_actor_name ?datetime
     WHERE {
         ?data_drop rdf:type ddss:DataDrop .
-        ?data_drop ddss:partOf ?aim .
+        ?data_drop ddss:ddPartOf ?aim .
         ?aim ddss:hasModelName ?aim_name .
         ?data_drop ddss:uploadedBy ?upload_actor .
         ?upload_actor ddss:hasName ?upload_actor_name .
@@ -1740,7 +1807,7 @@ def dd_new_aim(aim_name):
     input.add((
         s2, p2, o2,
     ))
-    return aim_namespace
+    return aim_namespace, unique_aim_id
 
 ### Data drop: create data drop ###
 
@@ -1760,7 +1827,7 @@ def dd_create(o_aim, user_id):
     current_datetime = datetime.now().strftime("%Y-%m-%dT%H:%M")
     p3 = URIRef(ns_ddss+predicate3)
     o3 = Literal(current_datetime)
-    predicate4 = 'partOf'
+    predicate4 = 'ddPartOf'
     p4 = URIRef(ns_ddss+predicate4)
     o4 = URIRef(o_aim)
     input = sparqlstore.SPARQLUpdateStore()
@@ -1886,7 +1953,7 @@ def dd_event1(o_aim, event_type, event_description, startdatetime, enddatetime, 
     input.add((
         s, p8, o8,
     ))
-    return 'Success, added {} as an event with unique ID {}.'.format(event_type, unique_event_id)
+    return unique_event_id
 
 def dd_event2(o_aim, unique_dd_id, unique_event_id):
     ns_aim = Namespace(o_aim)
@@ -1899,14 +1966,27 @@ def dd_event2(o_aim, unique_dd_id, unique_event_id):
     input.add((
         s1, p1, o1,
     ))
-    return 'Success, selected the event with unique ID {}.'.format(unique_event_id)
+    return unique_event_id
+
+def dd_event3(o_aim, bot_relations, unique_event_id):
+    ns_aim = Namespace(o_aim)
+    input = sparqlstore.SPARQLUpdateStore()
+    input.open((sparql_endpoint_1, sparql_endpoint_2))
+    for relation in bot_relations:
+        predicate = 'relatesToPhysicalObject'
+        s = URIRef(ns_aim+unique_event_id)
+        p = URIRef(ns_ddss+predicate)
+        o = URIRef(ns_aim+relation)
+        input.add((
+            s, p, o,
+        ))
 
 ### Data drop: upload document: check for previous versions ###
 
-def dd_prev_version_check(file_exists_check, o_aim):
+def dd_prev_version_check(file_exists_check, o_aim, unique_aim_id):
     prev_version = file_exists_check[-1]
     prev_version_rev = str(f"'{prev_version}'")
-    prev_location = str(document_storage_location+'/'+prev_version)
+    prev_location = str(document_storage_location+'/'+unique_aim_id+'/'+prev_version)
     prev_location_rev = str(f"'{prev_location}'")
     nss_aim = str('aim: <'+o_aim+'>')
     input = sparqlstore.SPARQLUpdateStore()
@@ -2374,26 +2454,31 @@ def dd_ifc2(o_aim, unique_document_id, model_data, intersections):
                 s, p7, o7,
             ))
 
-def dd_ifc3(o_aim, model_data, relations):
+def dd_ifc3(o_aim, model_data, relations, existing_data):
     input = sparqlstore.SPARQLUpdateStore()
     input.open((sparql_endpoint_1, sparql_endpoint_2))
-    # output = []
+    exists_check = []
+    for existing_instance in existing_data:
+        existing_instance_guid = existing_instance.guid
+        existing_instance_guid_rev = existing_instance_guid.replace('rdflib.term.Literal(', '').replace(')', '')
+        exists_check.append(existing_instance_guid_rev)
     for rel_instance in relations:
         for model_instance in model_data:
-            if rel_instance.parent_guid == model_instance.guid:
-                parent_guid = rel_instance.parent_guid
-                child_guid = rel_instance.child_guid
-                parent_uri = dd_ifc4(o_aim, parent_guid)
-                child_uri = dd_ifc4(o_aim, child_guid)
-                input = sparqlstore.SPARQLUpdateStore()
-                input.open((sparql_endpoint_1, sparql_endpoint_2))
-                predicate1 = 'containsZone'
-                s1 = URIRef(parent_uri)
-                p1 = URIRef(ns_bot+predicate1)
-                o1 = URIRef(child_uri)   
-                input.add((
-                    s1, p1, o1,
-                ))
+            if model_instance.guid not in exists_check:
+                if rel_instance.parent_guid == model_instance.guid:
+                    parent_guid = rel_instance.parent_guid
+                    child_guid = rel_instance.child_guid
+                    parent_uri = dd_ifc4(o_aim, parent_guid)
+                    child_uri = dd_ifc4(o_aim, child_guid)
+                    input = sparqlstore.SPARQLUpdateStore()
+                    input.open((sparql_endpoint_1, sparql_endpoint_2))
+                    predicate1 = 'containsZone'
+                    s1 = URIRef(parent_uri)
+                    p1 = URIRef(ns_bot+predicate1)
+                    o1 = URIRef(child_uri)   
+                    input.add((
+                        s1, p1, o1,
+                    ))
                 
 
 def dd_ifc4(o_aim, instance_guid):                
@@ -2422,13 +2507,169 @@ def dd_ifc4(o_aim, instance_guid):
         uri = row.bot
     return uri
 
+def dd_document3(o_aim, bot_relations, unique_document_id):
+    ns_aim = Namespace(o_aim)
+    input = sparqlstore.SPARQLUpdateStore()
+    input.open((sparql_endpoint_1, sparql_endpoint_2))
+    for relation in bot_relations:
+        predicate = 'relatesToPhysicalObject'
+        s = URIRef(ns_aim+unique_document_id)
+        p = URIRef(ns_ddss+predicate)
+        o = URIRef(ns_aim+relation)
+        input.add((
+            s, p, o,
+        ))
 
+###################
+### Fork models ###
+###################
 
+def fork_export(aim_namespace):
+    unique_aim_id = aim_namespace.replace(aim_default_namespace, '').replace('#', '')
+    unique_fork_id = BNode()
+    ns_aim = Namespace(aim_namespace)
+    nss_aim = str('aim: <'+aim_namespace+'>')
+    input = sparqlstore.SPARQLUpdateStore()
+    input.open((sparql_endpoint_1))
+    q1 = """
+    PREFIX """+nss_bot+"""
+    PREFIX """+nss_ddss+"""
+    PREFIX """+nss_rdf+"""
+    PREFIX """+nss_org+"""
+    PREFIX """+nss_foaf+"""
+    PREFIX """+nss_oms+"""
+    PREFIX """+nss_aim+"""
+    CONSTRUCT {
+        ?s ?p ?o
+    }
+    WHERE {
+        ?s ?p ?o .
+        FILTER(STRSTARTS(STR(?s), STR(aim:)))
+    }
+    """
+    result = input.query(q1)
+    g = Graph()
+    g.bind('ddss', ns_ddss)
+    g.bind('bot', ns_bot)
+    g.bind('rdf', ns_rdf)
+    g.bind('rdfs', ns_rdfs)
+    g.bind('oms', ns_oms)
+    g.bind('aim', ns_aim)
+    for row in result:
+        g.add(row)
+    output_location = str(document_storage_location_rel+'/fork_exports')
+    q2 = """
+    PREFIX """+nss_bot+"""
+    PREFIX """+nss_ddss+"""
+    PREFIX """+nss_rdf+"""
+    PREFIX """+nss_org+"""
+    PREFIX """+nss_foaf+"""
+    PREFIX """+nss_oms+"""
+    PREFIX """+nss_aim+"""
+    SELECT ?storage_location
+    WHERE {
+        ?document ddss:storedAt ?storage_location .
+        FILTER(STRSTARTS(STR(?document), STR(aim:)))
+    }
+    """
+    document_locations_q = input.query(q2)
+    zip_file_location = str(output_location+'/'+unique_fork_id+'_fork_export.zip')
+    zip_file = zipfile.ZipFile(zip_file_location, 'w')
+    for row in document_locations_q:
+        location = row.storage_location.replace('', '')
+        location_rev = location.replace(document_storage_location, document_storage_location_rel)
+        document_name = location.rsplit('/', 1)[1]
+        zip_file.write(location_rev, arcname=os.path.join(location_rev.replace(location_rev, str('documents/'+document_name))))
+    ttl_destination = str(output_location+'/'+unique_aim_id+'_fork_rdf_export.ttl')
+    file_system = FileSystemStorage(location=output_location)
+    predicate1 = 'isForkOf'
+    s1 = URIRef(ns_aim+unique_fork_id)
+    p1 = URIRef(ns_ddss+predicate1)
+    o1 = URIRef(ns_aim+unique_aim_id)
+    g.add((
+        s1, p1, o1,
+    ))
+    input.open((sparql_endpoint_1, sparql_endpoint_2))
+    predicate2 = 'hasFork'
+    s2 = URIRef(ns_aim+unique_aim_id)
+    p2 = URIRef(ns_ddss+predicate2)
+    o2 = URIRef(ns_aim+unique_fork_id)
+    input.add((
+        s2, p2, o2,
+    ))
+    g.serialize(destination=ttl_destination)
+    old_prefix = str('@prefix aim: <'+aim_default_namespace+unique_aim_id+'#>')
+    new_prefix = str('@prefix aim: <'+aim_default_namespace+unique_fork_id+'#>')
+    for line in fileinput.input(ttl_destination, inplace=True):
+        line = line.replace(old_prefix, new_prefix)
+        sys.stdout.write(line)
+    zip_file.write(ttl_destination, arcname=os.path.join(ttl_destination.replace(ttl_destination, 'fork_rdf_export.ttl')))
+    file_system.delete(unique_aim_id+'_fork_rdf_export.ttl')
+    zip_file.close()
+    return zip_file_location
 
-
-
-
-
+def fork_import(uploaded_file, uploaded_file_name):
+    unique_fork_id = uploaded_file_name.replace('_fork_export.zip', '')
+    zip_file = zipfile.ZipFile(uploaded_file, 'r')
+    zip_file.extractall(path=str('documents/fork_imports/'+unique_fork_id))
+    # zip_file.extract('fork_rdf_export.ttl', path=str('documents/fork_imports/'+unique_fork_id))
+    import_rdf = Graph()
+    import_rdf.parse('documents/fork_imports/'+unique_fork_id+'/fork_rdf_export.ttl')
+    p1 = URIRef(ns_ddss+'storedAt')
+    import_rdf.remove((
+        None, p1, None
+    ))
+    q = """
+    PREFIX """+nss_bot+"""
+    PREFIX """+nss_ddss+"""
+    PREFIX """+nss_rdf+"""
+    PREFIX """+nss_org+"""
+    PREFIX """+nss_foaf+"""
+    PREFIX """+nss_oms+"""
+    SELECT ?document ?doc_name
+    WHERE {
+        ?document rdf:type ?doc_type .
+        VALUES ?doc_type {
+                ddss:IFC
+                ddss:PDF
+                ddss:CSV
+                ddss:PNG
+                ddss:JPEG
+                ddss:PCD
+                ddss:TXT
+                ddss:IFC2x3
+                ddss:IFC4
+            }
+        ?document ddss:hasFileName ?doc_name .    
+    }
+    """
+    documents = import_rdf.query(q)
+    predicate = 'storedAt'
+    p2 = URIRef(ns_ddss+predicate)
+    new_storage_location = str(document_storage_location+'/'+unique_fork_id+'/')
+    try:
+        os.mkdir(os.path.join(document_storage_location, unique_fork_id))
+    except OSError as e:
+        if e.errno == 17:
+            pass
+    for doc in documents:
+        source = zip_file.open(str('documents/'+doc.doc_name))
+        target = open(os.path.join(new_storage_location, doc.doc_name), "wb")
+        with source, target:
+            shutil.copyfileobj(source, target)
+        s2 = URIRef(doc.document)
+        o2 = Literal(new_storage_location+doc.doc_name)
+        import_rdf.add((
+            s2, p2, o2,
+        ))
+    input = sparqlstore.SPARQLUpdateStore()
+    input.open((sparql_endpoint_1, sparql_endpoint_2))
+    for s, p, o in import_rdf.triples((None, None, None)):
+        input.add((
+            s, p, o
+        ))
+    # To do: verwijderen van bestand na importeren
+    
 
 
 
@@ -2444,6 +2685,12 @@ def dd_ifc4(o_aim, instance_guid):
 ########################
 ### test environment ###
 ########################
+
+    # try:
+    #     os.mkdir(os.path.join(output_location, unique_aim_id))
+    # except OSError as e:
+    #     if e.errno == 17:
+    #         pass
 
 # def rq_ifc1(o_aim, document_storage_location):
 #     model = ifcopenshell.open(document_storage_location)

@@ -1,0 +1,24 @@
+{% extends 'sidebar/template_fork.html' %}
+{% block content %}
+<p class="text-gray-900 text-base no-underline hover:no-underline font-extrabold text-xl" align="center"><b><u>Export AIM</u></b></p>
+<div style="text-align: center;">
+<br>
+<br>
+    <b>Select an AIM to be exported.</b>
+    <br><br>
+{% if existing_aims == check %}
+<a><i>There are no existing AIM's yet.</i></a>
+{% else %}
+ {% for aim in existing_aims %}
+ <form action="{% url 'app:fork_export_2' %}" method="post" style="display:inline;">
+    {% csrf_token %}
+    <input type="hidden" id="aim_namespace" name="aim_namespace" value="{{aim.namespace}}">
+    <button type="submit"
+       class="btn-link text-red-500 no-underline hover:underline">{{aim.name}}</button>
+    {{data_external}}
+ </form> 
+ <br>
+ {% endfor %}
+{% endif %}
+</div>
+{% endblock %}

@@ -36,6 +36,21 @@
     {% endfor %}
 </blockquote>
 <blockquote class="border-l-4 border-red-500 my-8 pl-8 md:pl-12">
+    <b>Events related to this {{instance_type}}:</b>
+    <br>
+    {% for event in instance_events %}
+    <form action="{% url 'app:instance_event' %}" method="post" style="display:inline;">
+        {% csrf_token %}
+        <input type="hidden" id="event_name" name="event_name" value="{{event.event_description}}">
+        <input type="hidden" id="event" name="event" value="{{event.event}}">
+        <button type="submit"
+            class="btn-link text-red-500 no-underline hover:underline"><i>{{event.event_description}}</i></button>
+        {{data_external}}
+    </form>
+    <br>
+    {% endfor %}
+</blockquote>
+<blockquote class="border-l-4 border-red-500 my-8 pl-8 md:pl-12">
     <b>Hierarchy</b>
     <br><br>
     {% for parent in parent_instances %}

@@ -132,9 +132,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_URL = '/document/'
 
-SPARQL_ENDPOINT_1 = 'http://localhost:7200/repositories/test_repo'
-SPARQL_ENDPOINT_2 = 'http://localhost:7200/repositories/test_repo/statements'
+SPARQL_ENDPOINT_1 = 'http://localhost:7200/repositories/fork_repo'
+SPARQL_ENDPOINT_2 = 'http://localhost:7200/repositories/fork_repo/statements'
 AIM_DEFAULT_NAMESPACE = 'https://github.com/chielvanderpas/aims/'
-MEDIA_ROOT = 'C:/Users/chiel/Desktop/django_ddss/documents'
 ORGANIZATION_DEFAULT_NAMESPACE = 'https://github.com/chielvanderpas/oms#'
 CURRENT_ORG = 'https://github.com/chielvanderpas/oms#fictional_test_org'
+MEDIA_ROOT = 'C:/Users/chiel/Desktop/django_ddss/ddss_github/ddss/documents'
+MEDIA_ROOT_REL = 'documents'
+

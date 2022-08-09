@@ -1,0 +1,36 @@
+{% extends 'sidebar/template_fork.html' %}
+{% block content %}
+<p class="text-gray-900 text-base no-underline hover:no-underline font-extrabold text-xl" align="center"><b><u>Import AIM</u></b></p>
+<div style="text-align: center;">
+<br><br>
+<b>Upload an AIM</b>
+<form method="post" id="form" enctype="multipart/form-data">
+    {% csrf_token %}
+    <br><br>
+    <label for="file">Upload AIM zip:</label>
+    <input required type="file" style="width: 45ch;" id="aim_import" name="aim_import">
+    {{data_external}}
+    <br><br><br>
+    <div style="display: flex; align-items: center; justify-content: center;">
+    <input formaction="{% url 'app:fork_import_2' %}" type="submit" value="Upload"/>
+</form>
+</div>
+<br><br>
+<b>Or import an AIM via its URI</b>
+<br><br>
+<form action="{% url 'app:fork_import_3' %}" method="post" style="display:inline;">
+   {% csrf_token %}
+   <label for="ext_url">Namespace:</label>
+   <input type="text" size="50" id="aim_namespace" name="aim_namespace">
+   <br><br>
+   <label for="ext_url">DDSS Url:</label>
+   <input type="text" size="50" id="ext_url" name="ext_url" placeholder="http://127.0.0.1:8000">
+   <br><br>
+   <input type="submit" value="Import"/>
+   {{data_external}}
+</form>
+<br><br><br>
+<b><i>{{error_message}}</i></b>
+<br><br>
+</div>
+{% endblock %}

@@ -1,5 +1,10 @@
 {% extends 'sidebar/template_add_data.html' %}
 {% block content %}
+{% if unique_dd_id == None %}
+<script>
+    window.location.href="{% url 'app:dd_end_2' %}"
+</script>
+{% else %}
 <p class="text-gray-900 text-base no-underline hover:no-underline font-extrabold text-xl" align="center"><b><u>Add a new event</u></b></p>
 <br>
 {{output}}
@@ -67,7 +72,6 @@
       </select>
       <br><br>
       {{data_external}}
-      <input formaction="{% url 'app:dd_create_extra_event_1' %}" type="submit" value="Add another event">
       <input formaction="{% url 'app:dd_create_new_event_2' %}" type="submit" value="Continue">
     </form>
     <script>
@@ -87,4 +91,5 @@
     </script>
     <br><br><br><br>
     <p class="py-4 text-gray-600 text-sm">* In case no end date & time are defined, the start date & time is equal to the date & time the event occured.</p>
-{% endblock %}
+{% endif %}
+    {% endblock %}

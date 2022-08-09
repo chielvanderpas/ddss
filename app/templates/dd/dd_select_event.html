@@ -1,14 +1,38 @@
 {% extends 'sidebar/template_add_data.html' %}
 {% block content %}
+{% if unique_dd_id == None %}
+<script>
+    window.location.href="{% url 'app:dd_end_2' %}"
+</script>
+{% else %}
 <p class="text-gray-900 text-base no-underline hover:no-underline font-extrabold text-xl" align="center"><b><u>Select event</u></b></p>
 <div style="text-align: center;">
 <br>
-<p class="py-6">A data drop has been created with unique ID <i>{{output}}</i>. Would you like to relate this data drop to an existing event or would you like to create a new event?</p>
 <br>
-<form>
-    <input formaction="{% url 'app:dd_create_new_event_1' %}" type="submit" value="Create new event"/>
-    <input {{disabled}} formaction="{% url 'app:dd_select_existing_event_1' %}" type="submit" value="Select existing event"/>
-    <input formaction="{% url 'app:dd_upload_file_1' %}" type="{{visibility_status}}" value="Continue with earlier selected event"/>
+    <b>Select an event to which this data drop will be related.</b>
+    <br><br>
+{% if existing_events == check %}
+<a><i>There are no existing events yet. Please create a new event.</i></a>
+<br><br><br>
+<form action="{% url 'app:dd_create_new_event_1' %}">
+   <input type="submit" value="Create new event" />
 </form>
 </div>
+{% else %}
+ {% for event in existing_events %}
+ <form action="{% url 'app:dd_select_existing_event_1' %}" method="post" style="display:inline;">
+    {% csrf_token %}
+    <input type="hidden" id="event" name="event" value="{{event.id}}">
+    <button type="submit"
+       class="btn-link text-red-500 no-underline hover:underline">{{event.list_text}}</button>
+    {{data_external}}
+ </form>
+ {% endfor %}
+ <br><br><br>
+ <form action="{% url 'app:dd_create_new_event_1' %}">
+    <input type="submit" value="Or create a new event" />
+ </form>
+</div>
+{% endif %}
+{% endif %}
 {% endblock %}

@@ -8,6 +8,10 @@
     <br><br>
 {% if existing_aims == check %}
 <a><i>There are no existing AIM's yet. Please add a new AIM.</i></a>
+<br><br><br>
+<form action="{% url 'app:dd_create_new_aim_1' %}">
+   <input type="submit" value="Create new AIM" />
+</form>
 {% else %}
  {% for aim in existing_aims %}
  <form action="{% url 'app:dd_select_existing_aim' %}" method="post" style="display:inline;">
@@ -17,13 +21,13 @@
     <button type="submit"
        class="btn-link text-red-500 no-underline hover:underline">{{aim.name}}</button>
     {{data_external}}
- </form>
+ </form> 
  <br>
  {% endfor %}
- {% endif %}
  <br><br>
  <form action="{% url 'app:dd_create_new_aim_1' %}">
     <input type="submit" value="Or add a new AIM" />
  </form>
 </div>
+{% endif %}
 {% endblock %}

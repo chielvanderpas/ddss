@@ -192,4 +192,69 @@
     {% endif %}
     {% endfor %}
 </blockquote>
+{% if document_data.0.doc_type == 'IFC' %}
+<div class="col-md-3 w-full">
+    <canvas id="myCanvas" width="600" height="300"></canvas>
+    <!--<canvas id="myNavCubeCanvas"></canvas>
+    <div id="treeViewContainer"></div>-->
+</div>
+<script type="module">
+
+    import {Viewer, WebIFCLoaderPlugin, NavCubePlugin, TreeViewPlugin} from "https://cdn.jsdelivr.net/npm/@xeokit/xeokit-sdk/dist/xeokit-sdk.es.min.js";
+  
+    const viewer = new Viewer({
+        canvasId: "myCanvas",
+        transparent: true
+    });
+  
+    viewer.camera.eye = [-3.933, 2.855, 27.018];
+    viewer.camera.look = [4.400, 3.724, 8.899];
+    viewer.camera.up = [-0.018, 0.999, 0.039];
+  
+    //new NavCubePlugin(viewer, {
+    //    canvasId: "myNavCubeCanvas",
+    //    visible: true,
+    //    size: 250,
+    //    alignment: "bottomRight",
+    //    bottomMargin: 100,
+    //    rightMargin: 10
+    //});
+  
+    //new TreeViewPlugin(viewer, {
+    //    containerElement: document.getElementById("treeViewContainer"),
+    //    autoExpandDepth: 3 // Initially expand the root tree node
+    //});
+  
+    const ifcLoader = new WebIFCLoaderPlugin(viewer, {
+        //wasmPath: "../dist/" // <<------- Path to web-ifc.wasm, which does the IFC parsing for us
+        wasmPath: "https://cdn.jsdelivr.net/npm/@xeokit/xeokit-sdk/dist/"
+    });
+  
+    //var modelName = "smallhouse.ifc";
+    //modelName = "../../../uploads/" + modelName;
+    //var modelName = "{{ ifcURL }}";
+    // var modelName = "..\\..\\..\\downloadFile\\" + "{{ ifcURL }}"
+    // var modelName = "{{document_data.0.storage_location}}"
+    // console.log(modelName)
+
+    var modelName = "\\app\\document\\" + "{{aim_id}}" + "\\" + "{{document_data.0.file_name}}"
+
+    const sceneModel = ifcLoader.load({
+        id: "myModel",
+        //src: "../assets/models/ifc/Duplex.ifc",
+        src: modelName,
+        loadMetadata: true, // Default
+        excludeTypes: ["IfcSpace"],
+        edges: true
+    });
+  
+    //const t0 = performance.now();
+    //document.getElementById("time").innerHTML = "Loading model...";
+    //sceneModel.on("loaded", function () {
+    //    const t1 = performance.now();
+    //    document.getElementById("time").innerHTML = "Model loaded in " + Math.floor(t1 - t0) / 1000.0 + " seconds<br>Objects: " + sceneModel.numEntities;
+    //});
+  
+  </script>
+  {% endif %}
 {% endblock %}

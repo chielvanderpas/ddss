@@ -50,20 +50,30 @@ urlpatterns = [
     path('dd/existing_aim/', views.dd_select_existing_aim, name='dd_select_existing_aim'),
     path('dd/new_aim/1/', views.dd_create_new_aim_1, name='dd_create_new_aim_1'),
     path('dd/new_aim/2/', views.dd_create_new_aim_2, name='dd_create_new_aim_2'),
-    path('dd/new_event/1/', views.dd_create_new_event_1, name='dd_create_new_event_1'),
-    path('dd/extra_event/1/', views.dd_create_extra_event_1, name='dd_create_extra_event_1'),
-    path('dd/new_event/2/', views.dd_create_new_event_2, name='dd_create_new_event_2'),
-    path('dd/existing_event/1/', views.dd_select_existing_event_1, name='dd_select_existing_event_1'),
-    path('dd/existing_event/2/', views.dd_select_existing_event_2, name='dd_select_existing_event_2'),
     path('dd/upload_file/1/', views.dd_upload_file_1, name='dd_upload_file_1'),
     path('dd/upload_file/2/', views.dd_upload_file_2, name='dd_upload_file_2'),
     path('dd/upload_file/3/', views.dd_upload_file_3, name='dd_upload_file_3'),
     path('dd/upload_file/4/', views.dd_upload_file_4, name='dd_upload_file_4'),
     path('dd/upload_file/5/', views.dd_upload_file_5, name='dd_upload_file_5'),
-    path('dd/end/', views.dd_end, name='dd_end'),
+    path('dd/upload_file/6/', views.dd_upload_file_6, name='dd_upload_file_6'),
+    path('dd/select_event/', views.dd_select_event, name='dd_select_event'),
+    path('dd/existing_event/1/', views.dd_select_existing_event_1, name='dd_select_existing_event_1'),
+    path('dd/new_event/1/', views.dd_create_new_event_1, name='dd_create_new_event_1'),
+    path('dd/new_event/2/', views.dd_create_new_event_2, name='dd_create_new_event_2'),
+    path('dd/link_event/1/', views.dd_link_event_1, name='dd_link_event_1'),
+    path('dd/link_event/2/', views.dd_link_event_2, name='dd_link_event_2'),
+    path('dd/end/1/', views.dd_end_1, name='dd_end_1'),
+    path('dd/end/2/', views.dd_end_2, name='dd_end_2'),
     ############################
-    path('ifc_viewer/', views.ifc_viewer, name='ifc_viewer'),
-]
-
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    ### fork models ############
+    path('fork/', views.fork, name='fork'),
+    path('fork/export/1/', views.fork_export_1, name='fork_export_1'),
+    path('fork/export/2/', views.fork_export_2, name='fork_export_2'),
+    path('fork/import/1/', views.fork_import_1, name='fork_import_1'),
+    path('fork/import/2/', views.fork_import_2, name='fork_import_2'),
+    path('fork/import/3/', views.fork_import_3, name='fork_import_3'),
+    path('fork/import/4/', views.fork_import_4, name='fork_import_4'),
+    path('fork/import/5/', views.fork_import_5, name='fork_import_5'),
+    ############################
+    # path('ifc_viewer/', views.ifc_viewer, name='ifc_viewer'),
+]   + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

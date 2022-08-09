@@ -1,21 +1,21 @@
 {% extends 'sidebar/template_add_data.html' %}
 {% block content %}
+{% if unique_dd_id == None %}
+<script>
+    window.location.href="{% url 'app:dd_end_2' %}"
+</script>
+{% else %}
 <p class="text-gray-900 text-base no-underline hover:no-underline font-extrabold text-xl" align="center"><b><u>End of data drop</u></b></p>
 <div style="text-align: center;">
 <br>
 {{message}}
-{% if disabled != 'disabled' %}
 <p class="py-6">Do you want to upload another document or end the data drop?</p>
 <br><br>
 <form>
-    <input {{disabled}} formaction="{% url 'app:dd_upload_file_1' %}" type="submit" value="Upload another document"/>
-    <input formaction="{% url 'app:dd_end' %}" type="submit" value="End data drop"/>
+    <input formaction="{% url 'app:dd_upload_file_1' %}" type="submit" value="Upload another document"/>
+    <input formaction="{% url 'app:dd_create_new_event_1' %}" type="submit" value="Add another event"/>
+    <input formaction="{% url 'app:dd_end_2' %}" type="submit" value="End data drop"/>
 </form>
-{% else %}
-<script>
-    window.location.href="{% url 'app:dd_end' %}"
-</script>
-{% endif %}
 </div>
-{{output}}
+{% endif %}
 {% endblock %}
