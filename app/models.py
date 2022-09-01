@@ -385,6 +385,44 @@ def rq_sparql_query(query):
 
 ### data request models: aims ###
 
+def rq_aim_fork(aim_namespace):
+    nss_aim = str('aim: <'+aim_namespace+'>')
+    aim_rev = str(f"<{aim_namespace}>")
+    input = sparqlstore.SPARQLUpdateStore()
+    input.open((sparql_endpoint_1))
+    q = """
+    PREFIX """+nss_bot+"""
+    PREFIX """+nss_ddss+"""
+    PREFIX """+nss_rdf+"""
+    PREFIX """+nss_oms+"""
+    PREFIX """+nss_aim+"""
+    SELECT ?parent_fork ?child_fork
+    WHERE {
+        ?aim rdf:type ddss:AIM .
+        VALUES ?aim {
+            """+aim_rev+"""
+        }
+        ?aim ddss:hasModelName ?aim_name .
+        OPTIONAL {
+            ?aim ddss:isForkOf ?parent_fork 
+        }
+        OPTIONAL {
+            ?aim ddss:hasFork ?child_fork 
+        }
+    }
+    """
+    result = input.query(q)
+    parent_forks = []
+    child_forks = []
+    for row in result:
+        if row.parent_fork != None:
+            parent_fork = row.parent_fork.replace('', '')
+            parent_forks.append(parent_fork)
+        if row.child_fork != None:
+            child_fork = row.child_fork.replace('', '')
+            child_forks.append(child_fork)
+    return parent_forks, child_forks
+
 def rq_aim_bot(aim_namespace):
     nss_aim = str('aim: <'+aim_namespace+'>')
     aim_rev = str(f"<{aim_namespace}>")
@@ -2528,6 +2566,7 @@ def fork_export(aim_namespace):
     unique_aim_id = aim_namespace.replace(aim_default_namespace, '').replace('#', '')
     unique_fork_id = BNode()
     ns_aim = Namespace(aim_namespace)
+    ns_aim_default = Namespace(aim_default_namespace)
     nss_aim = str('aim: <'+aim_namespace+'>')
     input = sparqlstore.SPARQLUpdateStore()
     input.open((sparql_endpoint_1))
@@ -2583,17 +2622,17 @@ def fork_export(aim_namespace):
     ttl_destination = str(output_location+'/'+unique_aim_id+'_fork_rdf_export.ttl')
     file_system = FileSystemStorage(location=output_location)
     predicate1 = 'isForkOf'
-    s1 = URIRef(ns_aim+unique_fork_id)
+    s1 = URIRef(ns_aim_default+unique_fork_id+'#')
     p1 = URIRef(ns_ddss+predicate1)
-    o1 = URIRef(ns_aim+unique_aim_id)
+    o1 = URIRef(ns_aim_default+unique_aim_id+'#')
     g.add((
         s1, p1, o1,
     ))
     input.open((sparql_endpoint_1, sparql_endpoint_2))
     predicate2 = 'hasFork'
-    s2 = URIRef(ns_aim+unique_aim_id)
+    s2 = URIRef(ns_aim_default+unique_aim_id+'#')
     p2 = URIRef(ns_ddss+predicate2)
-    o2 = URIRef(ns_aim+unique_fork_id)
+    o2 = URIRef(ns_aim_default+unique_fork_id+'#')
     input.add((
         s2, p2, o2,
     ))
@@ -2611,10 +2650,9 @@ def fork_export(aim_namespace):
 def fork_import(uploaded_file, uploaded_file_name):
     unique_fork_id = uploaded_file_name.replace('_fork_export.zip', '')
     zip_file = zipfile.ZipFile(uploaded_file, 'r')
-    zip_file.extractall(path=str('documents/fork_imports/'+unique_fork_id))
-    # zip_file.extract('fork_rdf_export.ttl', path=str('documents/fork_imports/'+unique_fork_id))
+    import_rdf_zip = zip_file.open('fork_rdf_export.ttl')
     import_rdf = Graph()
-    import_rdf.parse('documents/fork_imports/'+unique_fork_id+'/fork_rdf_export.ttl')
+    import_rdf.parse(import_rdf_zip)
     p1 = URIRef(ns_ddss+'storedAt')
     import_rdf.remove((
         None, p1, None
@@ -2668,389 +2706,3 @@ def fork_import(uploaded_file, uploaded_file_name):
         input.add((
             s, p, o
         ))
-    # To do: verwijderen van bestand na importeren
-    
-
-
-
-
-
-
-
-
-
-
-
-
-########################
-### test environment ###
-########################
-
-    # try:
-    #     os.mkdir(os.path.join(output_location, unique_aim_id))
-    # except OSError as e:
-    #     if e.errno == 17:
-    #         pass
-
-# def rq_ifc1(o_aim, document_storage_location):
-#     model = ifcopenshell.open(document_storage_location)
-#     namedlist = collections.namedtuple('namedlist', ['type', 'guid', 'name', 'longname', 'description'])
-#     model_data = []
-#     ifcsites = model.by_type('IFCSITE')
-#     for site in ifcsites:
-#         type = 'Site'
-#         guid = site.GlobalId
-#         name = site.Name
-#         long_name = site.LongName
-#         description = site.Description
-#         model_data.append(namedlist(type, guid, name, long_name, description))
-#     ifcbuildings = model.by_type('IFCBUILDING')
-#     for building in ifcbuildings:
-#         type = 'Building'
-#         guid = building.GlobalId
-#         name = building.Name
-#         long_name = building.LongName
-#         description = building.Description
-#         model_data.append(namedlist(type, guid, name, long_name, description))
-#     ifcbuildingstoreys = model.by_type('IFCBUILDINGSTOREY')
-#     for storey in ifcbuildingstoreys:
-#         type = 'Storey'
-#         guid = storey.GlobalId
-#         name = storey.Name
-#         long_name = storey.LongName
-#         description = storey.Description
-#         model_data.append(namedlist(type, guid, name, long_name, description))
-#     ifcspaces = model.by_type('IFCSPACE')
-#     for space in ifcspaces:
-#         type = 'Space'
-#         guid = space.GlobalId
-#         name = space.Name
-#         long_name = space.LongName
-#         description = space.Description
-#         model_data.append(namedlist(type, guid, name, long_name, description))
-#     # ifcelements = model.by_type('IFCELEMENT')
-#     # for element in ifcelements:
-#     #     type = 'Element'
-#     #     guid = element.GlobalId
-#     #     name = element.Name
-#     #     long_name = element.Tag
-#     #     description = element.Description
-#     #     model_data.append(namedlist(type, guid, name, long_name, description))
-#     nss_aim = str('aim: <'+o_aim+'>')
-#     input = sparqlstore.SPARQLUpdateStore()
-#     input.open((sparql_endpoint_1))
-#     q = """
-#     PREFIX """+nss_bot+"""
-#     PREFIX """+nss_ddss+"""
-#     PREFIX """+nss_rdf+"""
-#     PREFIX """+nss_org+"""
-#     PREFIX """+nss_foaf+"""
-#     PREFIX """+nss_oms+"""
-#     PREFIX """+nss_aim+"""
-#     SELECT ?bot ?bot_type ?guid ?name ?longname ?description
-#     WHERE {
-#         ?bot rdf:type ?bot_type .
-#         VALUES ?bot_type {
-#             bot:Site
-#             bot:Building
-#             bot:Storey
-#             bot:Space
-#             bot:Element
-#             }
-#         OPTIONAL {
-#             ?bot ddss:hasGuid ?guid .
-#             }
-#         OPTIONAL {
-#             ?bot ddss:hasName ?name .
-#             }
-#         OPTIONAL {
-#             ?bot ddss:hasLongName ?longname .
-#             }
-#         OPTIONAL {
-#             ?bot ddss:hasDescription ?description .
-#             }
-#     }
-#     """
-#     result = input.query(q)
-#     existing_data = []
-#     for row in result:
-#         uri = row.bot
-#         type = row.bot_type
-#         if type != None:
-#             type_rev1 = type.replace('rdflib.term.URIRef(', '')
-#             type_rev2 = type_rev1.replace("https://w3id.org/bot#", "")
-#             type_rev3 = type_rev2.replace(')', '')
-#         else:
-#             type_rev2 = type
-#         guid = row.guid
-#         if guid != None:
-#             guid_rev1 = guid.replace('rdflib.term.Literal(', '')
-#             guid_rev2 = guid_rev1.replace(')', '')
-#         else:
-#             guid_rev2 = guid
-#         name = row.name
-#         if name != None:
-#             name_rev1 = name.replace('rdflib.term.Literal(', '')
-#             name_rev2 = name_rev1.replace(')', '')
-#         else:
-#             name_rev2 = name
-#         long_name = row.longname
-#         if long_name != None:
-#             long_name_rev1 = long_name.replace('rdflib.term.Literal(', '')
-#             long_name_rev2 = long_name_rev1.replace(')', '')
-#         else:
-#             long_name_rev2 = long_name
-#         description = row.description
-#         if description != None:
-#             description_rev1 = guid.replace('rdflib.term.Literal(', '')
-#             description_rev2 = description_rev1.replace(')', '')
-#         else:
-#             description_rev2 = description
-#         existing_data.append(namedlist(type_rev3, guid_rev2, name_rev2, long_name_rev2, description_rev2))
-#     intersections = set(model_data).intersection(set(existing_data))
-#     return model_data, existing_data, intersections
-
-# model = ifcopenshell.open('Atlas_8_floor_SB.ifc')
-
-# ifcParentElement = '#166'
-# ifcType = 'IFCSITE'
-
-# def rq_ifc1(o_aim, document_storage_location):
-#     model = ifcopenshell.open(document_storage_location)
-
-
-
-
-# def getChildrenOfType(ifcParentElement,ifcType):
-#     items=[]
-#     if type(ifcType) != list:
-#         ifcType=[ifcType]
-#     _getChildrenOfType(items,ifcParentElement,ifcType,0)
-#     return items
-
-# def _getChildrenOfType(targetList,element,ifcTypes,level):
-#     # follow Spatial relation
-#     if (element.is_a('IfcSpatialStructureElement')):
-#         for rel in element.ContainsElements:
-#             relatedElements = rel.RelatedElements
-#             for child in relatedElements:
-#                 _getChildrenOfType(targetList,child, ifcTypes, level + 1)
-#     # follow Aggregation Relation
-#     if (element.is_a('IfcObjectDefinition')):
-#         for rel in element.IsDecomposedBy:
-#             relatedObjects = rel.RelatedObjects
-#             for child in relatedObjects:
-#                 _getChildrenOfType(targetList,child, ifcTypes, level + 1)
-#     for typ in ifcTypes:
-#         if (element.is_a(typ)):
-#             targetList.append(element)
-
-# def rq_model5(type):
-#     input = sparqlstore.SPARQLUpdateStore()
-#     input.open((sparql_endpoint_1))
-#     q = """
-#     PREFIX """+nss_bot+"""
-#     PREFIX """+nss_ddss+"""
-#     PREFIX """+nss_rdf+"""
-#     PREFIX """+nss_org+"""
-#     PREFIX """+nss_foaf+"""
-#     PREFIX """+nss_oms+"""
-#     PREFIX """+nss_aim+"""
-#     SELECT ?subject
-#     WHERE {
-#         ?subject rdf:type """+type+"""
-#     }
-#     """
-#     result = input.query(q)
-#     output = []
-#     for row in result:
-#         subject = row.subject
-#         if o_ddss in subject:
-#             subject_rev = subject.replace(o_ddss, '')
-#         elif o_rdf in subject:
-#             subject_rev = subject.replace(o_rdf, '')
-#         elif o_bot in subject:
-#             subject_rev = subject.replace(o_bot, '')
-#         elif o_org in subject:
-#             subject_rev = subject.replace(o_org, '')
-#         elif o_foaf in subject:
-#             subject_rev = subject.replace(o_foaf, '')
-#         else:
-#             subject_rev = subject
-#         output.append(subject_rev)
-#     return output
-
-# def rq_aim_content(aim):
-#     nss_aim = str('aim: <'+aim+'>')
-#     aim_rev = str(f"<{aim}>")
-#     input = sparqlstore.SPARQLUpdateStore()
-#     input.open((sparql_endpoint_1))
-#     q = """
-#     PREFIX """+nss_bot+"""
-#     PREFIX """+nss_ddss+"""
-#     PREFIX """+nss_rdf+"""
-#     PREFIX """+nss_oms+"""
-#     PREFIX """+nss_aim+"""
-#     SELECT ?aim ?name ?site ?building ?storey ?space ?event ?document
-#     WHERE {
-#         ?aim rdf:type ddss:AIM .
-#         VALUES ?aim {
-#             """+aim_rev+"""
-#         }
-#         ?aim ddss:hasModelName ?name .
-#     	OPTIONAL {
-#             ?site rdf:type bot:Site .
-#             ?site ddss:partOf ?aim .
-#         }
-#         OPTIONAL {
-#             ?building rdf:type bot:Building .
-#             ?building ddss:partOf ?aim .
-#         }
-#         OPTIONAL {
-#             ?storey rdf:type bot:Storey .
-#             ?storey ddss:partOf ?aim .
-#         }
-#         OPTIONAL {
-#             ?space rdf:type bot:Space .
-#             ?space ddss:partOf ?aim .
-#         }
-#         OPTIONAL {
-#             ?event rdf:type ddss:Event .
-#             ?event ddss:partOf ?aim .
-#         }
-#         OPTIONAL {
-#             ?document rdf:type ?doc_type .
-#             VALUES ?doc_type {
-#                 ddss:IFC
-#                 ddss:PDF
-#                 ddss:CSV
-#                 ddss:PNG
-#                 ddss:JPEG
-#                 ddss:PCD
-#                 ddss:TXT
-#                 ddss:IFC2x3
-#                 ddss:IFC4
-#             }
-#             ?document ddss:partOf ?aim .
-#         }
-#     }
-#     """
-#     result = input.query(q)
-#     namedlist = collections.namedtuple('namedlist', ['aim', 'name', 'site', 'building', 'storey', 'space', 'event', 'document'])
-#     output = []
-#     for row in result:
-#         aim = row.aim
-#         name = row.name
-#         site = row.site
-#         building = row.building
-#         storey = row.storey
-#         space = row.space
-#         event = row.event
-#         document = row.document
-#         output.append(namedlist(aim, name, site, building, storey, space, event, document))
-#     return output
-
-# def rq_model2(query_construct, query_where):
-#     input = SPARQLWrapper(sparql_endpoint_1)
-#     input.setQuery("""
-#     PREFIX """+o_bot+"""
-#     CONSTRUCT { """+query_construct+""" }
-#     WHERE { """+query_where+""" . }
-#     """)
-#     output = input.queryAndConvert().serialize(format=TURTLE)
-#     return output
-
-# def generate_unique_code():
-#     length = 6
-#     while True:
-#         code = ''.join(random.choices(string.ascii_uppercase, k=length))
-#         if Room.objects.filter(code=code).count() == 0:
-#             break
-#     return code
-
-# class Room(models.Model):
-#     code = models.CharField(max_length=8, default='', unique=True)
-#     host = models.CharField(max_length=50, unique=True)
-#     guest_can_pause = models.BooleanField(null=False, default=False)
-#     votes_to_skip = models.IntegerField(null=False, default=1)
-#     created_at = models.DateTimeField(auto_now_add=True)
-
-# class Triple(models.Model):
-#     subject = models.CharField(max_length=200)
-#     ns_subject = models.CharField(max_length=200)
-#     predicate = models.CharField(max_length=200)
-#     ns_predicate = models.CharField(max_length=200)
-#     object = models.CharField(max_length=200)
-#     ns_object = models.CharField(max_length=200)
-
-# def dd_model_test():
-#     s = URIRef(Triple.ns_subject+Triple.subject)
-#     p = URIRef(Triple.ns_predicate+Triple.predicate)
-#     o = URIRef(Triple.ns_object+Triple.object)
-#     input = sparqlstore.SPARQLUpdateStore()
-#     input.open((sparql_endpoint_1, sparql_endpoint_2))
-#     input.add((
-#         s, p, o,
-#     ))
-#     return 'Success, added {} {} {}!'.format(Triple.subject, Triple.predicate, Triple.object)
-
-# def dd_model1_new(subject):
-#     predicate = 'type'
-#     object = 'Site'
-#     s = URIRef(ns_ddss+subject)
-#     p = URIRef(ns_rdf+predicate)
-#     o = URIRef(ns_bot+object)
-#     input = sparqlstore.SPARQLUpdateStore()
-#     input.open((sparql_endpoint_1, sparql_endpoint_2))
-#     input.add((
-#         s, p, o,
-#     ))
-
-# def dd_model2(site, subject, object):
-#     if object == 'Building':
-#         predicate1 = 'containsBuilding'
-#     elif object == 'Storey':
-#         predicate1 = 'containsStorey'
-#     elif object == 'Space':
-#         predicate1 = 'containsSpace'
-#     elif object == 'Element':
-#         predicate1 = 'containsElement'
-#     else:
-#         predicate1 = 'containsZone'
-#     s1 = URIRef(ns_ddss+site)
-#     p1 = URIRef(ns_bot+predicate1)
-#     o1 = URIRef(ns_ddss+subject)
-#     predicate2 = 'type'
-#     s2 = URIRef(ns_ddss+subject)
-#     p2 = URIRef(ns_rdf+predicate2)
-#     o2 = URIRef(ns_bot+object)
-#     input = sparqlstore.SPARQLUpdateStore()
-#     input.open((sparql_endpoint_1, sparql_endpoint_2))
-#     input.add((
-#         s1, p1, o1,
-#     ))
-#     input.add((
-#         s2, p2, o2,
-#     ))
-#     return 'Success, added {} as a bot:{}'.format(subject, object)
-
-# class dd_info(models.Model):
-#     dd_unique_id = models.CharField()
-#     current_user_unique_id = models.CharField()
-
-# class singleton(models.Model):
-#     class Meta:
-#         abstract = TRUE
-#     def save(self, *args, **kwargs):
-#         self.pk = 1
-#         super(singleton, self).save(*args, **kwargs)
-#     def delete(self, *args, **kwargs):
-#         pass
-#     @classmethod
-#     def load(cls):
-#         obj,_=cls.objects.get_or_create(pk=1)
-#         return obj
-
-# class ddss_settings(singleton):
-#     sparql_endpoint_1 = models.CharField()
-#     sparql_endpoint_2 = models.CharField()

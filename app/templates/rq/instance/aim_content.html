@@ -15,6 +15,40 @@
     </form>
 </div>
 <br>
+<blockquote class="border-l-4 border-red-500 my-8 pl-8 md:pl-12">
+    <b>Parent AIM of this AIM</b>
+    <br>
+    {% if parent_fork != empty_list %}
+    {% for instance in parent_fork %}
+    <form action="#" method="post" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit" id="parent_fork" name="parent_fork" value="{{instance}}"
+            class="btn-link text-red-500 no-underline hover:underline"><i>{{instance}}</i></button>
+        {{data_external}}
+    </form>
+    <br>
+    {% endfor %}
+    {% else %}
+    <a><i>This AIM is not a fork of another AIM.</i></a>
+    {% endif %}
+</blockquote>
+<blockquote class="border-l-4 border-red-500 my-8 pl-8 md:pl-12">
+    <b>Forks of this AIM</b>
+    <br>
+    {% if child_forks != empty_list %}
+    {% for instance in child_forks %}
+    <form action="#" method="post" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit" id="child_fork" name="child_fork" value="{{instance}}"
+            class="btn-link text-red-500 no-underline hover:underline"><i>{{instance}}</i></button>
+        {{data_external}}
+    </form>
+    <br>
+    {% endfor %}
+    {% else %}
+    <a><i>This AIM has not yet been forked.</i></a>
+    {% endif %}
+</blockquote>
 {% for site_instance in bot %}
 {% if site_instance.bot_type == 'Site' %}
 <blockquote class="border-l-4 border-red-500 my-8 pl-8 md:pl-12">
@@ -73,7 +107,7 @@
                     class="btn-link text-red-500 no-underline hover:underline"><i>{{space_instance.bot_name}}</i></button>
                 {{data_external}}
             </form>
-            <br>
+            <a>, </a>
          {% endif %}
          {% endif %}
          {% endfor %}

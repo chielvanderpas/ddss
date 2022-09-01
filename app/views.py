@@ -8,7 +8,7 @@ from tracemalloc import stop
 from urllib import request
 from django import views
 from django.shortcuts import render, redirect
-from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext, loader
 from rdflib import Namespace
 from datetime import datetime
@@ -188,10 +188,12 @@ def instance_aim_content(request):
     else:
         aim_namespace = request.session.get('aim_namespace')
         aim_name = request.session.get('aim_name')
+    parent_fork, child_forks = models.rq_aim_fork(aim_namespace)
     bot, bot_relations = models.rq_aim_bot(aim_namespace)
     documents = models.rq_aim_documents(aim_namespace)
     events = models.rq_aim_events(aim_namespace)
-    return render(request, 'rq/instance/aim_content.html', {'first_name':first_name, 'aim_name':aim_name, 'aim_namespace':aim_namespace, 'bot':bot, 'bot_relations':bot_relations, 'documents':documents, 'events':events})
+    empty_list = []
+    return render(request, 'rq/instance/aim_content.html', {'first_name':first_name, 'aim_name':aim_name, 'aim_namespace':aim_namespace, 'parent_fork':parent_fork, 'child_forks':child_forks, 'bot':bot, 'bot_relations':bot_relations, 'documents':documents, 'events':events, 'empty_list':empty_list})
 
 @login_required
 def instance_aim_dd(request):
@@ -645,12 +647,12 @@ def fork_import_2(request):
     uploaded_file = request.FILES['aim_import']
     uploaded_file_name = uploaded_file.name
     models.fork_import(uploaded_file, uploaded_file_name)
-    message = 'The AIM {} has succesfully been uploaded!'.format(uploaded_file_name)
-    return render(request, 'fork/fork_import.html', {'first_name':first_name, 'message':message})
+    message = 'The AIM {} has succesfully been imported!'.format(uploaded_file_name)
+    return render(request, 'fork/fork.html', {'first_name':first_name, 'message':message})
 
 @login_required
 def fork_import_3(request):
-    ddss_url = str('http://'+request.META['HTTP_HOST'])
+    ddss_url = 'http://127.0.0.1:8000'
     aim_namespace = request.POST.get('aim_namespace')
     ext_url = request.POST.get('ext_url')
     base_url = str(ext_url+'/app/fork/import/4/')
@@ -660,7 +662,7 @@ def fork_import_3(request):
     return HttpResponseRedirect(urlx)
 
 def fork_import_4(request):
-    ddss_url = str('http://'+request.META['HTTP_HOST'])
+    ddss_url = 'http://127.0.0.1:8000'
     aim_namespace = request.GET.get('aim_namespace')
     ddss_url_ext = request.GET.get('ddss_url')
     zip_file_location = models.fork_export(aim_namespace)
@@ -684,51 +686,6 @@ def fork_import_5(request):
     file_system.save(zip_file_name, zip_temp)
     zip_file_location_rev = str(storage_location+'/'+zip_file_name)
     models.fork_import(zip_file_location_rev, zip_file_name)
+    file_system.delete(zip_file_location_rev)
     message = 'The AIM {} has succesfully been imported!'.format(zip_file_name)
-    return render(request, 'index.html', {'first_name':first_name, 'output':message})
-
-
-
-
-
-
-
-
-
-########################
-### test environment ###
-########################
-
-# def ifc_viewer(request):
-#     return render(request, 'ifc_viewer.html')
-
-# @login_required
-# def search_results(request):
-#     first_name = request.user.get_short_name()
-#     type = 'ddss:Maintenance'
-#     output = models.rq_model5(type)
-#     return render(request, 'rq/instance.html', {'first_name':first_name, 'output':output})
-
-# from . import serializers
-# from rest_framework import serializers, viewsets, generics
-
-# def write_ontology(request):
-#     welcome_message = models.model_write_ontology()
-#     return render(request, 'index.html', {'welcome_message':welcome_message})
-
-# @login_required
-# def dd_create_extra_event_1(request):
-#     first_name = request.user.get_short_name()
-#     o_aim = request.session.get('o_aim', None)
-#     aim_name = request.session.get('aim_name')
-#     existing_events = models.rq_event2(o_aim)
-#     existing_actors =models.rq_actor3()
-#     event_type = request.POST.get('event_type')
-#     event_description = request.POST.get('event_description')
-#     startdatetime = request.POST.get('startdatetime')
-#     enddatetime = request.POST.get('enddatetime')
-#     related_actor = request.POST.get('related_actor')
-#     super_event = request.POST.get('super_event')
-#     unique_dd_id = request.session.get('unique_dd_id', None)
-#     output = models.dd_event1(o_aim, event_type, event_description, startdatetime, enddatetime, related_actor, super_event, unique_dd_id)
-#     return render(request, 'dd/dd_create_new_event.html', {'output':output, 'aim_name':aim_name, 'first_name':first_name, 'existing_events':existing_events, 'existing_actors':existing_actors})
+    return render(request, 'fork/fork.html', {'first_name':first_name, 'message':message})
