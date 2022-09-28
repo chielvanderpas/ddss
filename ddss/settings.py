@@ -132,11 +132,27 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_URL = '/document/'
 
-SPARQL_ENDPOINT_1 = 'http://localhost:7200/repositories/fork_repo'
-SPARQL_ENDPOINT_2 = 'http://localhost:7200/repositories/fork_repo/statements'
+GraphDB_sparql_endpoint = 'http://localhost:7200/repositories/'
+GraphDB_sparql_endpoint_statements = '/statements'
+Media_root_rel = 'documents'
+MEDIA_ROOT_REL = 'documents'
+
+GraphDB_Repository_ID = 'test_repo'
+AIM_default_namespace = 'https://github.com/chielvanderpas/aims/'
+Media_root_location = 'C:/Users/chiel/Desktop/django_ddss/ddss/'
 AIM_DEFAULT_NAMESPACE = 'https://github.com/chielvanderpas/aims/'
 ORGANIZATION_DEFAULT_NAMESPACE = 'https://github.com/chielvanderpas/oms#'
 CURRENT_ORG = 'https://github.com/chielvanderpas/oms#fictional_test_org'
-MEDIA_ROOT = 'C:/Users/chiel/Desktop/django_ddss/ddss_github/ddss/documents'
-MEDIA_ROOT_REL = 'documents'
+
+SPARQL_ENDPOINT_1 = str(GraphDB_sparql_endpoint+GraphDB_Repository_ID)
+SPARQL_ENDPOINT_2 = str(GraphDB_sparql_endpoint+GraphDB_Repository_ID+GraphDB_sparql_endpoint_statements)
+MEDIA_ROOT = str(Media_root_location+Media_root_rel)
+
+# SPARQL_ENDPOINT_1 = 'http://localhost:7200/repositories/test_repo'
+# SPARQL_ENDPOINT_2 = 'http://localhost:7200/repositories/test_repo/statements'
+# AIM_DEFAULT_NAMESPACE = 'https://github.com/chielvanderpas/aims/'
+# ORGANIZATION_DEFAULT_NAMESPACE = 'https://github.com/chielvanderpas/oms#'
+# CURRENT_ORG = 'https://github.com/chielvanderpas/oms#fictional_test_org'
+# MEDIA_ROOT = 'C:/Users/chiel/Desktop/django_ddss/ddss/documents'
+# MEDIA_ROOT_REL = 'documents'
 

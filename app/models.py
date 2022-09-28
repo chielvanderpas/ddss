@@ -1,27 +1,12 @@
-from hashlib import sha3_224
-from pickle import TRUE
-from re import X
-from turtle import Turtle
-from xml.dom.expatbuilder import Namespaces
-from xml.dom.minidom import Document
-from django.forms import DateTimeField
-from django.http import HttpResponse
-from pyparsing import punc8bit
-from rdflib import Graph, URIRef, BNode, Literal, Namespace, Dataset
-from rdflib.namespace import RDFS, XSD, FOAF, OWL, RDF, NamespaceManager
+from rdflib import Graph, URIRef, BNode, Literal, Namespace
 from rdflib.plugins.stores import sparqlstore
-from SPARQLWrapper import SPARQLWrapper, SPARQLWrapper2, XML, TURTLE, JSON
-from django.db import models
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login, logout, get_user_model
+from django.contrib.auth import authenticate, login, logout
 from django.conf import settings
 from datetime import datetime
 from django.core.files.storage import FileSystemStorage
-from django.core.files import File
-import string, random, collections, os, zipfile, sys, fileinput, shutil
+import collections, os, zipfile, sys, fileinput, shutil
 import ifcopenshell
-
-# g.add_graph
 
 ####################
 ### Dependencies ###
@@ -84,7 +69,7 @@ nss_oms = str('oms: <'+o_oms+'>')
 def model_write_ontology():
     ontology = Graph()
     ontology.parse('ddss/app/ontology/DDSS_ontology.ttl')
-    output = ontology.serialize(format=TURTLE)
+    output = ontology.serialize(format="turtle")
     input = sparqlstore.SPARQLUpdateStore()
     input.open((sparql_endpoint_1, sparql_endpoint_2))
     return output

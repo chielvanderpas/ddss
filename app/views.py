@@ -662,7 +662,7 @@ def fork_import_3(request):
     return HttpResponseRedirect(urlx)
 
 def fork_import_4(request):
-    ddss_url = 'http://127.0.0.1:8000'
+    ddss_url = str('http://'+request.META['HTTP_HOST'])
     aim_namespace = request.GET.get('aim_namespace')
     ddss_url_ext = request.GET.get('ddss_url')
     zip_file_location = models.fork_export(aim_namespace)
@@ -686,6 +686,6 @@ def fork_import_5(request):
     file_system.save(zip_file_name, zip_temp)
     zip_file_location_rev = str(storage_location+'/'+zip_file_name)
     models.fork_import(zip_file_location_rev, zip_file_name)
-    file_system.delete(zip_file_location_rev)
+    # file_system.delete(zip_file_location_rev)
     message = 'The AIM {} has succesfully been imported!'.format(zip_file_name)
     return render(request, 'fork/fork.html', {'first_name':first_name, 'message':message})
